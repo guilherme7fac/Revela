@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Painel — REVELA</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--v:#00E676;--ve:#00B050;--p:#070A0B;--p2:#0E1315;--p3:#161D20;--c:#8A9399;--b:#F0F4F2}
+body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-height:100vh}
+.loading{position:fixed;inset:0;background:var(--p);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px}
+.loading-logo{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:8px}.loading-logo span{color:var(--v)}
+.loading-bar{width:200px;height:2px;background:rgba(255,255,255,.1);border-radius:1px;overflow:hidden}
+.loading-bar::after{content:'';display:block;height:100%;background:var(--v);animation:load 1.5s ease-in-out infinite}
+@keyframes load{0%{width:0%;transform:translateX(0)}50%{width:100%}100%{width:0%;transform:translateX(200px)}}
+nav{background:var(--p2);border-bottom:1px solid rgba(255,255,255,.06);padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;color:var(--b);text-decoration:none}.logo span{color:var(--v)}
+.nav-user{display:flex;align-items:center;gap:14px}
+.user-name{font-size:13px;color:var(--c)}
+.btn-sair{background:none;border:1px solid rgba(255,255,255,.1);color:var(--c);font-size:12px;padding:7px 14px;border-radius:2px;cursor:pointer;transition:border-color .2s,color .2s}.btn-sair:hover{border-color:rgba(255,60,60,.4);color:#ff6b6b}
+.main{max-width:900px;margin:0 auto;padding:40px 24px}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:1px;color:var(--b);margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--c);margin-bottom:36px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:36px}
+.card{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:22px}
+.card-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--c);margin-bottom:8px}
+.card-value{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:1px;color:var(--b)}
+.card-value.verde{color:var(--v)}
+.card-desc{font-size:11px;color:var(--c);margin-top:4px}
+.section-box{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:28px;margin-bottom:20px}
+.box-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.5px;color:var(--b);margin-bottom:4px}
+.box-sub{font-size:12px;color:var(--c);margin-bottom:22px}
+.perfil-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg{margin-bottom:0}
+.fg label{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--c);margin-bottom:5px}
+.fg input,.fg select{width:100%;background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:2px;padding:10px 12px;color:var(--b);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.fg input:focus,.fg select:focus{border-color:var(--v)}
+.fg select option{background:var(--p3)}
+.btn-salvar{background:var(--v);color:var(--p);font-weight:500;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border:none;border-radius:2px;cursor:pointer;transition:background .2s,transform .2s;margin-top:16px}
+.btn-salvar:hover{background:var(--ve);transform:translateY(-1px)}.btn-salvar:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.video-area{border:1.5px dashed rgba(255,255,255,.1);border-radius:4px;padding:40px 24px;text-align:center;transition:border-color .3s;cursor:pointer}
+.video-area:hover{border-color:rgba(0,230,118,.3)}
+.video-area-icon{font-size:36px;margin-bottom:12px}
+.video-area-title{font-size:14px;font-weight:500;color:var(--b);margin-bottom:6px}
+.video-area-sub{font-size:12px;color:var(--c);margin-bottom:16px}
+.fg-link{margin-bottom:16px}
+.fg-link label{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--c);margin-bottom:5px}
+.fg-link input{width:100%;background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:2px;padding:10px 12px;color:var(--b);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+.fg-link input:focus{border-color:var(--v)}
+.videos-list{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.video-item{background:var(--p3);border:1px solid rgba(255,255,255,.06);border-radius:2px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.vi-info{flex:1}
+.vi-title{font-size:13px;font-weight:500;color:var(--b);margin-bottom:3px}
+.vi-meta{font-size:11px;color:var(--c)}
+.vi-status{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px}
+.status-pend{background:rgba(255,214,0,.1);color:var(--amarelo,#FFD600);border:1px solid rgba(255,214,0,.2)}
+.status-ok{background:rgba(0,230,118,.1);color:var(--v);border:1px solid rgba(0,230,118,.2)}
+.msg{padding:10px 14px;border-radius:2px;font-size:12px;margin-top:12px;display:none}
+.msg.err{background:rgba(255,60,60,.09);border:1px solid rgba(255,60,60,.28);color:#ff6b6b;display:block}
+.msg.ok{background:rgba(0,230,118,.09);border:1px solid rgba(0,230,118,.28);color:var(--v);display:block}
+.empty-state{text-align:center;padding:32px;color:var(--c);font-size:13px}
+@media(max-width:600px){.cards{grid-template-columns:1fr 1fr}.perfil-grid{grid-template-columns:1fr}nav{padding:14px 16px}.main{padding:24px 16px}}
+</style>
+</head>
+<body>
+<div class="loading" id="loading">
+  <div class="loading-logo">REVEL<span>A</span></div>
+  <div class="loading-bar"></div>
+</div>
+<nav>
+  <a href="index.html" class="logo">REVEL<span>A</span></a>
+  <div class="nav-user">
+    <span class="user-name" id="userEmail">—</span>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </div>
+</nav>
+<main class="main">
+  <div class="page-title">Meu Painel</div>
+  <p class="page-sub">Bem-vindo ao Revela — aqui você gerencia seu perfil e seus vídeos.</p>
+  <div class="cards">
+    <div class="card"><div class="card-label">Visualizações</div><div class="card-value verde" id="statViews">0</div><div class="card-desc">clubes viram seu perfil</div></div>
+    <div class="card"><div class="card-label">Vídeos enviados</div><div class="card-value" id="statVids">0</div><div class="card-desc">disponíveis para olheiros</div></div>
+    <div class="card"><div class="card-label">Status</div><div class="card-value verde" style="font-size:22px;padding-top:8px">Ativo</div><div class="card-desc">perfil visível para clubes</div></div>
+  </div>
+  <div class="section-box">
+    <div class="box-title">Meu Perfil</div>
+    <p class="box-sub">Mantenha seus dados atualizados para aparecer nas buscas.</p>
+    <div class="perfil-grid">
+      <div class="fg"><label>Nome completo</label><input type="text" id="pNome" placeholder="Seu nome"></div>
+      <div class="fg"><label>Data de nascimento</label><input type="date" id="pData"></div>
+      <div class="fg"><label>Estado</label><select id="pEst"><option value="">Selecione</option><option>AC</option><option>AL</option><option>AM</option><option>AP</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MG</option><option>MS</option><option>MT</option><option>PA</option><option>PB</option><option>PE</option><option>PI</option><option>PR</option><option>RJ</option><option>RN</option><option>RO</option><option>RR</option><option>RS</option><option>SC</option><option>SE</option><option>SP</option><option>TO</option></select></div>
+      <div class="fg"><label>Cidade</label><input type="text" id="pCid" placeholder="Sua cidade"></div>
+      <div class="fg"><label>Posição</label><select id="pPos"><option value="">Selecione</option><option>Goleiro</option><option>Lateral Direito</option><option>Lateral Esquerdo</option><option>Zagueiro</option><option>Volante</option><option>Meia</option><option>Atacante</option><option>Ponta Direita</option><option>Ponta Esquerda</option></select></div>
+      <div class="fg"><label>Altura (cm)</label><input type="number" id="pAltura" placeholder="Ex: 175"></div>
+    </div>
+    <div id="msgPerfil" class="msg"></div>
+    <button class="btn-salvar" id="btnPerfil" onclick="salvarPerfil()">Salvar perfil</button>
+  </div>
+  <div class="section-box">
+    <div class="box-title">Meus Vídeos</div>
+    <p class="box-sub">Envie links do YouTube ou Instagram com seus melhores momentos.</p>
+    <div class="fg-link"><label>Link do vídeo (YouTube ou Instagram)</label><input type="url" id="vLink" placeholder="https://youtube.com/watch?v=..."></div>
+    <div class="fg-link"><label>Descrição (opcional)</label><input type="text" id="vDesc" placeholder="Ex: Gol de falta no campeonato estadual"></div>
+    <div id="msgVideo" class="msg"></div>
+    <button class="btn-salvar" id="btnVideo" onclick="enviarVideo()">Enviar vídeo</button>
+    <div class="videos-list" id="videosList"><div class="empty-state">Nenhum vídeo enviado ainda.</div></div>
+  </div>
+</main>
+<script>
+const SURL='https://yrthxqmzuwurgthdfozx.supabase.co';
+const SKEY='sb_publishable_sPcnhj8prRj6UagRwFqrUA_73ZeFxC5';
+const {createClient}=supabase;
+const sb=createClient(SURL,SKEY);
+let userId=null;
+
+function showMsg(id,m,t){const e=document.getElementById(id);e.textContent=m;e.className='msg '+t;setTimeout(()=>{e.className='msg'},4000)}
+
+async function init(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='index.html';return;}
+  userId=session.user.id;
+  document.getElementById('userEmail').textContent=session.user.email;
+  await carregarPerfil();
+  await carregarVideos();
+  document.getElementById('loading').style.display='none';
+}
+
+async function carregarPerfil(){
+  const{data}=await sb.from('atletas').select('*').eq('id',userId).single();
+  if(data){
+    document.getElementById('pNome').value=data.nome||'';
+    document.getElementById('pData').value=data.data_nascimento||'';
+    document.getElementById('pEst').value=data.estado||'';
+    document.getElementById('pCid').value=data.cidade||'';
+    document.getElementById('pPos').value=data.posicao||'';
+    document.getElementById('pAltura').value=data.altura||'';
+  }
+}
+
+async function salvarPerfil(){
+  const btn=document.getElementById('btnPerfil');
+  btn.disabled=true;btn.textContent='Salvando...';
+  const{error}=await sb.from('atletas').upsert({
+    id:userId,
+    nome:document.getElementById('pNome').value.trim(),
+    data_nascimento:document.getElementById('pData').value||null,
+    estado:document.getElementById('pEst').value,
+    cidade:document.getElementById('pCid').value.trim(),
+    posicao:document.getElementById('pPos').value,
+    altura:document.getElementById('pAltura').value||null,
+    atualizado_em:new Date().toISOString()
+  });
+  if(error)showMsg('msgPerfil','Erro ao salvar: '+error.message,'err');
+  else showMsg('msgPerfil','✓ Perfil salvo com sucesso!','ok');
+  btn.disabled=false;btn.textContent='Salvar perfil';
+}
+
+async function carregarVideos(){
+  const{data}=await sb.from('videos').select('*').eq('atleta_id',userId).order('criado_em',{ascending:false});
+  const lista=document.getElementById('videosList');
+  document.getElementById('statVids').textContent=data?.length||0;
+  if(!data||data.length===0){lista.innerHTML='<div class="empty-state">Nenhum vídeo enviado ainda.</div>';return;}
+  lista.innerHTML=data.map(v=>`
+    <div class="video-item">
+      <div class="vi-info">
+        <div class="vi-title">${v.descricao||'Vídeo sem descrição'}</div>
+        <div class="vi-meta"><a href="${v.url}" target="_blank" style="color:var(--v);text-decoration:none">${v.url.substring(0,50)}...</a></div>
+      </div>
+      <span class="vi-status status-ok">Publicado</span>
+    </div>`).join('');
+}
+
+async function enviarVideo(){
+  const url=document.getElementById('vLink').value.trim();
+  const desc=document.getElementById('vDesc').value.trim();
+  if(!url)return showMsg('msgVideo','Cole o link do vídeo.','err');
+  if(!url.startsWith('http'))return showMsg('msgVideo','Link inválido. Use uma URL completa.','err');
+  const btn=document.getElementById('btnVideo');
+  btn.disabled=true;btn.textContent='Enviando...';
+  const{error}=await sb.from('videos').insert({atleta_id:userId,url,descricao:desc||null,criado_em:new Date().toISOString()});
+  if(error)showMsg('msgVideo','Erro ao enviar: '+error.message,'err');
+  else{showMsg('msgVideo','✓ Vídeo enviado! Já está visível para os olheiros.','ok');document.getElementById('vLink').value='';document.getElementById('vDesc').value='';await carregarVideos();}
+  btn.disabled=false;btn.textContent='Enviar vídeo';
+}
+
+async function sair(){await sb.auth.signOut();window.location.href='index.html';}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REVELA — Seu Talento Merece Ser Visto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--v:#00E676;--ve:#00B050;--p:#070A0B;--p2:#0E1315;--p3:#161D20;--c:#8A9399;--b:#F0F4F2}
+html{scroll-behavior:smooth}
+body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+.cur{width:10px;height:10px;background:var(--v);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .15s}
+.cur-r{width:32px;height:32px;border:1px solid rgba(0,230,118,.3);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%)}
+@media(hover:none){.cur,.cur-r{display:none}}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(7,10,11,.97),transparent);backdrop-filter:blur(8px)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:6px;color:var(--b);text-decoration:none}.logo span{color:var(--v)}
+.nav-links{display:flex;gap:28px;list-style:none;align-items:center}
+.nav-links a{font-size:12px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--c);text-decoration:none;transition:color .2s}.nav-links a:hover{color:var(--b)}
+.nav-btn{background:var(--v)!important;color:var(--p)!important;padding:8px 18px;border-radius:2px!important}
+.ham{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px}
+.ham span{width:22px;height:2px;background:var(--b);border-radius:1px;transition:.3s;display:block}
+.ham.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.ham.open span:nth-child(2){opacity:0}
+.ham.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mob{display:none;position:fixed;inset:0;background:var(--p2);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:28px}
+.mob.open{display:flex}
+.mob a{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;color:var(--b);text-decoration:none;transition:color .2s}.mob a:hover{color:var(--v)}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;padding:120px 40px 100px}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 60%,rgba(0,230,118,.05),transparent 70%)}
+.hero-grid{position:absolute;inset:0;opacity:.025;background-image:linear-gradient(rgba(0,230,118,1) 1px,transparent 1px),linear-gradient(90deg,rgba(0,230,118,1) 1px,transparent 1px);background-size:60px 60px}
+.bnum{position:absolute;right:-3%;top:50%;transform:translateY(-50%);font-family:'Bebas Neue',sans-serif;font-size:clamp(180px,32vw,480px);color:transparent;-webkit-text-stroke:1px rgba(0,230,118,.05);line-height:1;pointer-events:none;animation:float 9s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(-50%)}50%{transform:translateY(-52%)}}
+.hi{position:relative;z-index:2;max-width:840px}
+.htag{display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--v);text-transform:uppercase;margin-bottom:22px;opacity:0;animation:fu .6s ease .2s forwards}
+.htag::before{content:'';width:20px;height:1px;background:var(--v)}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,11vw,136px);line-height:.92;letter-spacing:2px;text-transform:uppercase;opacity:0;animation:fu .7s ease .35s forwards}
+h1 .d{color:var(--v);display:block}
+.hsub{margin-top:26px;font-size:clamp(14px,2vw,17px);font-weight:300;color:var(--c);max-width:440px;line-height:1.75;opacity:0;animation:fu .7s ease .5s forwards}
+.hbtns{margin-top:42px;display:flex;gap:12px;flex-wrap:wrap;opacity:0;animation:fu .7s ease .65s forwards}
+.bp{display:inline-flex;align-items:center;gap:9px;background:var(--v);color:var(--p);font-weight:500;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:15px 30px;border-radius:2px;border:none;text-decoration:none;cursor:pointer;transition:background .25s,transform .2s}
+.bp:hover{background:var(--ve);transform:translateY(-2px)}
+.bs{display:inline-flex;align-items:center;gap:9px;background:transparent;color:var(--b);font-weight:500;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:15px 30px;border-radius:2px;border:1px solid rgba(255,255,255,.13);text-decoration:none;cursor:pointer;transition:border-color .25s,color .25s,transform .2s}
+.bs:hover{border-color:var(--v);color:var(--v);transform:translateY(-2px)}
+.bi{width:17px;height:17px;flex-shrink:0}
+.stats{position:absolute;bottom:36px;left:40px;right:40px;display:flex;gap:36px;z-index:2;opacity:0;animation:fu .7s ease .8s forwards;flex-wrap:wrap}
+.sn{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--b)}.sn span{color:var(--v)}
+.sl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--c);margin-top:2px}
+.sep{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent)}
+section{padding:76px 40px;position:relative}
+.sl2{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--v);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sl2::before{content:'';width:26px;height:1px;background:var(--v)}
+.st{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,5vw,66px);line-height:.95;letter-spacing:1px;text-transform:uppercase;color:var(--b);margin-bottom:12px}
+.cf{background:var(--p2)}
+.steps{margin-top:48px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.step{background:var(--p3);border:1px solid rgba(255,255,255,.05);border-radius:4px;padding:22px;transition:border-color .3s,transform .3s}
+.step:hover{border-color:rgba(0,230,118,.22);transform:translateY(-4px)}
+.stn{font-family:'Bebas Neue',sans-serif;font-size:48px;color:rgba(0,230,118,.07);line-height:1;margin-bottom:10px}
+.sti{width:38px;height:38px;background:rgba(0,230,118,.1);border-radius:2px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.sti svg{width:19px;height:19px;color:var(--v)}
+.stt{font-weight:500;font-size:13px;margin-bottom:5px}
+.std{font-size:12px;color:var(--c);line-height:1.6}
+.cams{padding:0 40px 76px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.cc{padding:44px 38px;border-radius:4px;position:relative;overflow:hidden;min-height:440px;display:flex;flex-direction:column;transition:transform .3s}
+.cc:hover{transform:translateY(-5px)}
+.cca{background:var(--v)}
+.cco{background:var(--p3);border:1px solid rgba(255,255,255,.07)}
+.cct{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.17em;text-transform:uppercase;margin-bottom:26px;opacity:.6}
+.cca .cct{color:var(--p)}.cco .cct{color:var(--c)}
+.ccti{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,4vw,48px);line-height:.95;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px}
+.cca .ccti{color:var(--p)}.cco .ccti{color:var(--b)}
+.ccd{font-size:13px;line-height:1.75;font-weight:300;flex:1;margin-bottom:28px}
+.cca .ccd{color:rgba(7,10,11,.68)}.cco .ccd{color:var(--c)}
+.ccf{list-style:none;margin-bottom:28px;display:flex;flex-direction:column;gap:7px}
+.ccf li{display:flex;align-items:center;gap:7px;font-size:13px}
+.cca .ccf li{color:rgba(7,10,11,.78)}.cco .ccf li{color:var(--c)}
+.ck{width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px}
+.cca .ck{background:rgba(7,10,11,.14);color:var(--p)}.cco .ck{background:rgba(0,230,118,.14);color:var(--v)}
+.bca{display:inline-flex;align-items:center;gap:7px;background:var(--p);color:var(--v);font-weight:500;font-size:12px;letter-spacing:.07em;text-transform:uppercase;padding:13px 22px;border-radius:2px;border:none;cursor:pointer;transition:background .2s;align-self:flex-start}
+.bca:hover{background:rgba(7,10,11,.8)}
+.bco{display:inline-flex;align-items:center;gap:7px;background:var(--v);color:var(--p);font-weight:500;font-size:12px;letter-spacing:.07em;text-transform:uppercase;padding:13px 22px;border-radius:2px;border:none;cursor:pointer;transition:background .2s;align-self:flex-start}
+.bco:hover{background:var(--ve)}
+.tg{background:var(--p2)}
+.tgr{margin-top:44px;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.04);border-radius:4px;overflow:hidden}
+.ti{background:var(--p3);padding:22px 18px;display:flex;flex-direction:column;gap:9px;transition:background .25s;position:relative;overflow:hidden}
+.ti::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--v);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.ti:hover::before{transform:scaleX(1)}.ti:hover{background:rgba(0,230,118,.03)}
+.tt{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.14em;color:var(--v);text-transform:uppercase}
+.tn{font-weight:500;font-size:14px;color:var(--b)}
+.tr{font-size:11px;color:var(--c);line-height:1.5}
+.tf{margin-top:auto;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.09em;color:rgba(255,255,255,.16);text-transform:uppercase}
+.rg{margin-top:44px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.rc{background:var(--p3);border:1px solid rgba(255,255,255,.05);border-radius:4px;padding:28px 22px;position:relative;overflow:hidden;transition:border-color .3s,transform .3s}
+.rc:hover{border-color:rgba(0,230,118,.18);transform:translateY(-4px)}
+.rc.det{border-color:rgba(0,230,118,.22);background:rgba(0,230,118,.03)}
+.rbadge{position:absolute;top:14px;right:14px;background:var(--v);color:var(--p);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.11em;text-transform:uppercase;padding:3px 8px;border-radius:2px}
+.ri{width:42px;height:42px;background:rgba(0,230,118,.1);border-radius:2px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.ri svg{width:21px;height:21px;color:var(--v)}
+.rn{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--b);margin-bottom:7px}
+.rd{font-size:12px;color:var(--c);line-height:1.6;margin-bottom:14px}
+.rv{font-family:'Space Mono',monospace;font-size:11px;color:var(--v);letter-spacing:.07em}
+.ctaf{background:var(--v);padding:90px 40px;text-align:center;position:relative;overflow:hidden}
+.ctaf::before{content:'REVELA';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-size:24vw;color:transparent;-webkit-text-stroke:2px rgba(0,0,0,.05);white-space:nowrap;pointer-events:none}
+.ctaf .sl2{justify-content:center;color:rgba(7,10,11,.42)}.ctaf .sl2::before{background:rgba(7,10,11,.28)}
+.ctaf h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,7vw,86px);color:var(--p);text-transform:uppercase;line-height:.95;letter-spacing:1px;margin-bottom:18px;position:relative}
+.ctaf p{font-size:15px;color:rgba(7,10,11,.58);max-width:420px;margin:0 auto 36px;line-height:1.75;font-weight:300;position:relative}
+.ctaf .hbtns{justify-content:center;position:relative}
+.ctaf .bp{background:var(--p);color:var(--v)}.ctaf .bp:hover{background:rgba(7,10,11,.85)}
+.ctaf .bs{border-color:rgba(7,10,11,.18);color:var(--p)}.ctaf .bs:hover{border-color:var(--p);background:rgba(7,10,11,.07)}
+footer{background:var(--p);border-top:1px solid rgba(255,255,255,.05);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.fl{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:var(--b)}.fl span{color:var(--v)}
+.fc{font-size:11px;color:rgba(255,255,255,.18);letter-spacing:.04em}
+.fls{display:flex;gap:22px;list-style:none}
+.fls a{font-size:11px;color:rgba(255,255,255,.22);text-decoration:none;letter-spacing:.04em;transition:color .2s}.fls a:hover{color:var(--v)}
+.rev{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease}
+.rev.vis{opacity:1;transform:translateY(0)}
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--p)}::-webkit-scrollbar-thumb{background:rgba(0,230,118,.22);border-radius:2px}
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(7,10,11,.93);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)}
+.ov.show{display:flex}
+.modal{background:var(--p2);border:1px solid rgba(255,255,255,.08);border-radius:6px;width:100%;max-width:460px;padding:36px;position:relative;animation:min .3s ease;max-height:90vh;overflow-y:auto}
+@keyframes min{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.mclose{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--c);font-size:22px;cursor:pointer;transition:color .2s;line-height:1}.mclose:hover{color:var(--b)}
+.mtitle{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;color:var(--b);margin-bottom:3px}.mtitle span{color:var(--v)}
+.msub{font-size:12px;color:var(--c);margin-bottom:24px;line-height:1.5}
+.tabs{display:flex;margin-bottom:22px;border-bottom:1px solid rgba(255,255,255,.07)}
+.tab{flex:1;padding:9px;font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--c);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:color .2s,border-color .2s;margin-bottom:-1px}
+.tab.act{color:var(--v);border-bottom-color:var(--v)}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--c);margin-bottom:5px}
+.fg input,.fg select{width:100%;background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:2px;padding:11px 13px;color:var(--b);font-family:'DM Sans',sans-serif;font-size:13px;transition:border-color .2s;outline:none;-webkit-appearance:none}
+.fg input:focus,.fg select:focus{border-color:var(--v)}
+.fg select option{background:var(--p3)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bsub{width:100%;background:var(--v);color:var(--p);font-family:'DM Sans',sans-serif;font-weight:500;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px;border:none;border-radius:2px;cursor:pointer;transition:background .2s,transform .2s;margin-top:6px}
+.bsub:hover{background:var(--ve);transform:translateY(-1px)}.bsub:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.fsw{text-align:center;margin-top:14px;font-size:12px;color:var(--c)}
+.fsw a{color:var(--v);text-decoration:none;cursor:pointer}
+.fmsg{padding:11px 13px;border-radius:2px;font-size:12px;margin-bottom:14px;display:none}
+.fmsg.err{background:rgba(255,60,60,.09);border:1px solid rgba(255,60,60,.28);color:#ff6b6b;display:block}
+.fmsg.ok{background:rgba(0,230,118,.09);border:1px solid rgba(0,230,118,.28);color:var(--v);display:block}
+.tsel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.tcard{padding:14px;background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:2px;cursor:pointer;text-align:center;transition:border-color .2s,background .2s}
+.tcard:hover{border-color:rgba(0,230,118,.28)}
+.tcard.sel{border-color:var(--v);background:rgba(0,230,118,.05)}
+.tico{font-size:22px;margin-bottom:5px}
+.tlbl{font-size:13px;font-weight:500;color:var(--b)}
+.tdsc{font-size:11px;color:var(--c);margin-top:2px}
+@media(max-width:768px){
+  nav{padding:14px 20px}.nav-links{display:none}.ham{display:flex}
+  .hero{padding:90px 20px 80px}h1{font-size:clamp(50px,13vw,76px)}.stats{display:none}
+  section{padding:56px 20px}.steps{grid-template-columns:1fr 1fr}
+  .cams{grid-template-columns:1fr;padding:0 20px 56px}
+  .tgr{grid-template-columns:1fr 1fr}.rg{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center;padding:24px 20px}.fls{justify-content:center}
+  .modal{padding:24px 18px}.fr{grid-template-columns:1fr}
+}
+@media(max-width:480px){.steps{grid-template-columns:1fr}.tgr{grid-template-columns:1fr}.hbtns{flex-direction:column}.bp,.bs{justify-content:center}}
+</style>
+</head>
+<body>
+<div class="cur" id="cur"></div>
+<div class="cur-r" id="curR"></div>
+<div class="mob" id="mob">
+  <a href="#como-funciona" onclick="closeMob()">Como funciona</a>
+  <a href="#tecnologia" onclick="closeMob()">Tecnologia</a>
+  <a href="#receita" onclick="closeMob()">Planos</a>
+  <a href="#" onclick="closeMob();openModal('atleta')" style="color:var(--v)">Sou atleta</a>
+  <a href="#" onclick="closeMob();openModal('olheiro')">Sou olheiro</a>
+</div>
+<nav>
+  <a href="#" class="logo">REVEL<span>A</span></a>
+  <ul class="nav-links">
+    <li><a href="#como-funciona">Como funciona</a></li>
+    <li><a href="#tecnologia">Tecnologia</a></li>
+    <li><a href="#receita">Planos</a></li>
+    <li><a href="#" onclick="openModal('olheiro');return false">Para olheiros</a></li>
+    <li><a href="#" class="nav-btn" onclick="openModal('atleta');return false">Enviar vídeo</a></li>
+  </ul>
+  <button class="ham" id="ham" onclick="toggleMob()"><span></span><span></span><span></span></button>
+</nav>
+<section class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="bnum">10</div>
+  <div class="hi">
+    <div class="htag">Plataforma nacional de scouting</div>
+    <h1>Seu talento<span class="d">merece ser</span>visto</h1>
+    <p class="hsub">A primeira plataforma brasileira que conecta jovens atletas invisíveis aos olheiros, clubes e oportunidades que nunca tiveram acesso.</p>
+    <div class="hbtns">
+      <button class="bp" onclick="openModal('atleta')"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>Sou atleta — enviar vídeo</button>
+      <button class="bs" onclick="openModal('olheiro')"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Sou olheiro — acessar talentos</button>
+    </div>
+  </div>
+  <div class="stats">
+    <div><div class="sn">5<span>k+</span></div><div class="sl">Atletas cadastrados</div></div>
+    <div><div class="sn">26</div><div class="sl">Estados cobertos</div></div>
+    <div><div class="sn">120<span>+</span></div><div class="sl">Clubes parceiros</div></div>
+    <div><div class="sn">340<span>+</span></div><div class="sl">Conexões realizadas</div></div>
+  </div>
+</section>
+<div class="sep"></div>
+<section class="cf" id="como-funciona">
+  <div class="sl2 rev">Processo</div>
+  <h2 class="st rev">Como funciona</h2>
+  <div class="steps rev">
+    <div class="step"><div class="stn">01</div><div class="sti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div class="stt">Atleta envia o vídeo</div><div class="std">Upload pelo site ou WhatsApp. Qualquer câmera serve — o que importa é o talento.</div></div>
+    <div class="step"><div class="stn">02</div><div class="sti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div><div class="stt">IA analisa o desempenho</div><div class="std">Computer vision identifica velocidade, técnica e posicionamento automaticamente.</div></div>
+    <div class="step"><div class="stn">03</div><div class="sti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="stt">Olheiro acessa o perfil</div><div class="std">Clubes filtram por posição, região, idade e score. Banco de dados nacional.</div></div>
+    <div class="step"><div class="stn">04</div><div class="sti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="stt">Conexão acontece</div><div class="std">Clube contata a família. Revela facilita a intermediação de forma transparente.</div></div>
+  </div>
+</section>
+<div class="cams" id="atleta-sec">
+  <div class="cc cca rev">
+    <div class="cct">Para atletas</div>
+    <h3 class="ccti">Você joga.<br>A gente garante<br>que te vejam.</h3>
+    <p class="ccd">Gratuito para sempre. Envie seu vídeo, crie seu perfil e apareça para clubes de todo o Brasil — sem empresário ou conexão.</p>
+    <ul class="ccf"><li><span class="ck">✓</span>Upload pelo celular ou WhatsApp</li><li><span class="ck">✓</span>Perfil com análise automática</li><li><span class="ck">✓</span>Notificação quando clube visualizar</li><li><span class="ck">✓</span>100% gratuito — sempre</li></ul>
+    <button class="bca" onclick="openModal('atleta')">Enviar meu vídeo →</button>
+  </div>
+  <div class="cc cco rev" id="olheiro-sec">
+    <div class="cct">Para clubes e olheiros</div>
+    <h3 class="ccti">O próximo talento<br>está aqui.<br>Já mapeado.</h3>
+    <p class="ccd">Acesse o maior banco de jovens talentos do Brasil, filtrado por região, posição, idade e score de desempenho.</p>
+    <ul class="ccf"><li><span class="ck">✓</span>Busca por estado, posição e idade</li><li><span class="ck">✓</span>Relatório de IA por atleta</li><li><span class="ck">✓</span>Alertas de novos talentos</li><li><span class="ck">✓</span>Planos a partir de R$ 299/mês</li></ul>
+    <button class="bco" onclick="openModal('olheiro')">Acessar banco de talentos →</button>
+  </div>
+</div>
+<section class="tg" id="tecnologia">
+  <div class="sl2 rev">Stack tecnológico</div>
+  <h2 class="st rev">Infraestrutura<br>de ponta</h2>
+  <div class="tgr rev">
+    <div class="ti"><div class="tt">Frontend</div><div class="tn">Next.js</div><div class="tr">Site e painéis do atleta e olheiro</div><div class="tf">Fase 1</div></div>
+    <div class="ti"><div class="tt">Banco de dados</div><div class="tn">Supabase</div><div class="tr">Perfis, autenticação e tempo real</div><div class="tf">Fase 1</div></div>
+    <div class="ti"><div class="tt">Vídeos</div><div class="tn">CF R2</div><div class="tr">Armazenamento e entrega dos vídeos</div><div class="tf">Fase 1</div></div>
+    <div class="ti"><div class="tt">Automação</div><div class="tn">n8n</div><div class="tr">Notificações e fluxos automáticos</div><div class="tf">Fase 1</div></div>
+    <div class="ti"><div class="tt">Inteligência artificial</div><div class="tn">Computer Vision</div><div class="tr">Análise automática de vídeo</div><div class="tf">Fase 2</div></div>
+    <div class="ti"><div class="tt">Comunicação</div><div class="tn">WhatsApp API</div><div class="tr">Envio de vídeos e notificações</div><div class="tf">Fase 2</div></div>
+    <div class="ti"><div class="tt">Mobile</div><div class="tn">React Native</div><div class="tr">App para atletas e olheiros</div><div class="tf">Fase 3</div></div>
+    <div class="ti"><div class="tt">Analytics</div><div class="tn">Dashboard BI</div><div class="tr">Métricas de impacto nacional</div><div class="tf">Fase 3</div></div>
+  </div>
+</section>
+<section id="receita">
+  <div class="sl2 rev">Modelo de negócio</div>
+  <h2 class="st rev">Planos e parcerias</h2>
+  <div class="rg rev">
+    <div class="rc"><div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="rn">Planos para clubes</div><div class="rd">Acesso ao banco de talentos por região, posição e faixa etária. Basic, Pro e Premium.</div><div class="rv">A partir de R$ 299/mês</div></div>
+    <div class="rc det"><div class="rbadge">Principal</div><div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div class="rn">Patrocínio de marca</div><div class="rd">Marcas esportivas e bancos com agenda ESG associadas ao propósito social.</div><div class="rv">Cotas a partir de R$ 2.000/mês</div></div>
+    <div class="rc"><div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="rn">Taxa de intermediação</div><div class="rd">Valor fixo quando atleta assina contrato com clube via plataforma.</div><div class="rv">Por conexão bem-sucedida</div></div>
+  </div>
+</section>
+<div class="sep"></div>
+<section class="ctaf" id="cta">
+  <div class="sl2">Comece agora</div>
+  <h2>A peneira que<br>o Brasil esqueceu<br>de fazer.</h2>
+  <p>Milhares de talentos esperando para ser vistos. Faça parte do projeto que está mudando o futebol brasileiro.</p>
+  <div class="hbtns">
+    <button class="bp" onclick="openModal('atleta')"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>Sou atleta</button>
+    <button class="bs" onclick="openModal('olheiro')"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Sou olheiro</button>
+  </div>
+</section>
+<footer>
+  <div class="fl">REVEL<span>A</span></div>
+  <ul class="fls"><li><a href="#">Atletas</a></li><li><a href="#">Olheiros</a></li><li><a href="#">Clubes</a></li><li><a href="painel-atleta.html">Meu painel</a></li></ul>
+  <div class="fc">© 2025 Revela Brasil</div>
+</footer>
+
+<!-- MODAL -->
+<div class="ov" id="ov" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal()">×</button>
+    <div id="tipoSec">
+      <div class="mtitle">REVEL<span>A</span></div>
+      <p class="msub">Você é atleta ou olheiro/clube?</p>
+      <div class="tsel">
+        <div class="tcard" id="tcA" onclick="setTipo('atleta')"><div class="tico">⚽</div><div class="tlbl">Atleta</div><div class="tdsc">Quero ser visto</div></div>
+        <div class="tcard" id="tcO" onclick="setTipo('olheiro')"><div class="tico">👁️</div><div class="tlbl">Olheiro / Clube</div><div class="tdsc">Quero descobrir talentos</div></div>
+      </div>
+    </div>
+    <div id="formSec" style="display:none">
+      <div class="mtitle">REVEL<span>A</span></div>
+      <p class="msub" id="mSub">Crie sua conta gratuita</p>
+      <div class="tabs">
+        <button class="tab act" id="tabC" onclick="switchTab('c')">Cadastrar</button>
+        <button class="tab" id="tabL" onclick="switchTab('l')">Entrar</button>
+      </div>
+      <div id="fmsg" class="fmsg"></div>
+      <div id="fCad">
+        <div class="fr"><div class="fg"><label>Nome completo</label><input type="text" id="cNome" placeholder="Seu nome"></div><div class="fg"><label>Data de nascimento</label><input type="date" id="cData"></div></div>
+        <div class="fg"><label>E-mail</label><input type="email" id="cEmail" placeholder="seu@email.com"></div>
+        <div class="fg"><label>Senha</label><input type="password" id="cSenha" placeholder="Mínimo 6 caracteres"></div>
+        <div class="fr">
+          <div class="fg"><label>Estado</label><select id="cEst"><option value="">Selecione</option><option>AC</option><option>AL</option><option>AM</option><option>AP</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MG</option><option>MS</option><option>MT</option><option>PA</option><option>PB</option><option>PE</option><option>PI</option><option>PR</option><option>RJ</option><option>RN</option><option>RO</option><option>RR</option><option>RS</option><option>SC</option><option>SE</option><option>SP</option><option>TO</option></select></div>
+          <div class="fg"><label>Cidade</label><input type="text" id="cCid" placeholder="Sua cidade"></div>
+        </div>
+        <div class="fg" id="posGrp" style="display:none"><label>Posição</label><select id="cPos"><option value="">Selecione</option><option>Goleiro</option><option>Lateral Direito</option><option>Lateral Esquerdo</option><option>Zagueiro</option><option>Volante</option><option>Meia</option><option>Atacante</option><option>Ponta Direita</option><option>Ponta Esquerda</option></select></div>
+        <button class="bsub" id="btnC" onclick="cadastrar()">Criar conta gratuita</button>
+        <div class="fsw">Já tem conta? <a onclick="switchTab('l')">Entrar</a></div>
+      </div>
+      <div id="fLogin" style="display:none">
+        <div class="fg"><label>E-mail</label><input type="email" id="lEmail" placeholder="seu@email.com"></div>
+        <div class="fg"><label>Senha</label><input type="password" id="lSenha" placeholder="Sua senha"></div>
+        <button class="bsub" id="btnL" onclick="entrar()">Entrar</button>
+        <div class="fsw">Não tem conta? <a onclick="switchTab('c')">Cadastrar</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SURL='https://yrthxqmzuwurgthdfozx.supabase.co';
+const SKEY='sb_publishable_sPcnhj8prRj6UagRwFqrUA_73ZeFxC5';
+const {createClient}=supabase;
+const sb=createClient(SURL,SKEY);
+
+// Cursor
+const cur=document.getElementById('cur'),curR=document.getElementById('curR');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function anim(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(anim)})();
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.transform='translate(-50%,-50%) scale(2.4)';curR.style.borderColor='rgba(0,230,118,.55)'});
+  el.addEventListener('mouseleave',()=>{cur.style.transform='translate(-50%,-50%) scale(1)';curR.style.borderColor='rgba(0,230,118,.3)'});
+});
+
+// Mobile menu
+function toggleMob(){document.getElementById('ham').classList.toggle('open');document.getElementById('mob').classList.toggle('open')}
+function closeMob(){document.getElementById('ham').classList.remove('open');document.getElementById('mob').classList.remove('open')}
+
+// Scroll reveal
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')}),{threshold:.08});
+document.querySelectorAll('.rev').forEach(el=>obs.observe(el));
+
+// Modal
+let tipo='';
+function openModal(t){
+  document.getElementById('ov').classList.add('show');
+  document.getElementById('tipoSec').style.display='block';
+  document.getElementById('formSec').style.display='none';
+  if(t)setTimeout(()=>setTipo(t),40);
+}
+function closeModal(){document.getElementById('ov').classList.remove('show')}
+function setTipo(t){
+  tipo=t;
+  document.querySelectorAll('.tcard').forEach(c=>c.classList.remove('sel'));
+  document.getElementById(t==='atleta'?'tcA':'tcO').classList.add('sel');
+  setTimeout(()=>{
+    document.getElementById('tipoSec').style.display='none';
+    document.getElementById('formSec').style.display='block';
+    document.getElementById('posGrp').style.display=t==='atleta'?'block':'none';
+    document.getElementById('mSub').textContent=t==='atleta'?'Crie sua conta gratuita de atleta':'Acesse o banco de talentos';
+    switchTab('c');
+  },180);
+}
+function switchTab(a){
+  document.getElementById('fCad').style.display=a==='c'?'block':'none';
+  document.getElementById('fLogin').style.display=a==='l'?'block':'none';
+  document.getElementById('tabC').classList.toggle('act',a==='c');
+  document.getElementById('tabL').classList.toggle('act',a==='l');
+  hideMsg();
+}
+function showMsg(m,t){const e=document.getElementById('fmsg');e.textContent=m;e.className='fmsg '+t}
+function hideMsg(){document.getElementById('fmsg').className='fmsg'}
+
+async function cadastrar(){
+  const nome=document.getElementById('cNome').value.trim();
+  const email=document.getElementById('cEmail').value.trim();
+  const senha=document.getElementById('cSenha').value;
+  const data=document.getElementById('cData').value;
+  const est=document.getElementById('cEst').value;
+  const cid=document.getElementById('cCid').value.trim();
+  const pos=document.getElementById('cPos').value;
+  if(!nome||!email||!senha||!est||!cid)return showMsg('Preencha todos os campos obrigatórios.','err');
+  if(senha.length<6)return showMsg('A senha precisa ter pelo menos 6 caracteres.','err');
+  if(tipo==='atleta'&&!pos)return showMsg('Selecione sua posição.','err');
+  const btn=document.getElementById('btnC');
+  btn.disabled=true;btn.textContent='Criando conta...';
+  try{
+    const{data:d,error:e}=await sb.auth.signUp({email,password:senha,options:{data:{nome,tipo}}});
+    if(e)throw e;
+    if(d.user){
+      const tab=tipo==='atleta'?'atletas':'olheiros';
+      const perf=tipo==='atleta'
+        ?{id:d.user.id,nome,email,data_nascimento:data||null,estado:est,cidade:cid,posicao:pos}
+        :{id:d.user.id,nome,email,estado:est,cidade:cid};
+      await sb.from(tab).insert(perf);
+    }
+    showMsg('✓ Conta criada! Verifique seu e-mail para confirmar.','ok');
+    setTimeout(()=>closeModal(),3000);
+  }catch(e){
+    showMsg(e.message||'Erro ao criar conta. Tente novamente.','err');
+  }
+  btn.disabled=false;btn.textContent='Criar conta gratuita';
+}
+
+async function entrar(){
+  const email=document.getElementById('lEmail').value.trim();
+  const senha=document.getElementById('lSenha').value;
+  if(!email||!senha)return showMsg('Preencha e-mail e senha.','err');
+  const btn=document.getElementById('btnL');
+  btn.disabled=true;btn.textContent='Entrando...';
+  try{
+    const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
+    if(error)throw error;
+    const t=data.user?.user_metadata?.tipo||'atleta';
+    showMsg('✓ Login realizado! Redirecionando...','ok');
+    setTimeout(()=>{window.location.href=t==='atleta'?'painel-atleta.html':'painel-olheiro.html'},1200);
+  }catch(e){
+    showMsg(e.message==='Invalid login credentials'?'E-mail ou senha incorretos.':e.message,'err');
+  }
+  btn.disabled=false;btn.textContent='Entrar';
+}
+
+sb.auth.getSession().then(({data:{session}})=>{if(session)console.log('Usuário logado:',session.user.email)});
+</script>
+</body>
+</html>
