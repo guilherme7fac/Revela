@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — REVELA</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--v:#00E676;--ve:#00B050;--p:#070A0B;--p2:#0E1315;--p3:#161D20;--c:#8A9399;--b:#F0F4F2;--r:#ff6b6b;--y:#FFD600}
+body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-height:100vh}
+.loading{position:fixed;inset:0;background:var(--p);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px}
+.loading-logo{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:8px}.loading-logo span{color:var(--v)}
+.loading-bar{width:200px;height:2px;background:rgba(255,255,255,.1);border-radius:1px;overflow:hidden}
+.loading-bar::after{content:'';display:block;height:100%;background:var(--v);animation:load 1.5s ease-in-out infinite}
+@keyframes load{0%{width:0%;transform:translateX(0)}50%{width:100%}100%{width:0%;transform:translateX(200px)}}
+nav{background:var(--p2);border-bottom:1px solid rgba(255,255,255,.06);padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;color:var(--b);text-decoration:none}.logo span{color:var(--v)}
+.nav-right{display:flex;align-items:center;gap:14px}
+.admin-badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;background:rgba(0,230,118,.1);color:var(--v);border:1px solid rgba(0,230,118,.2);padding:4px 10px;border-radius:2px}
+.btn-sair{background:none;border:1px solid rgba(255,255,255,.1);color:var(--c);font-size:12px;padding:7px 14px;border-radius:2px;cursor:pointer;transition:border-color .2s,color .2s}.btn-sair:hover{border-color:rgba(255,60,60,.4);color:var(--r)}
+.main{max-width:1100px;margin:0 auto;padding:36px 24px}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:1px;color:var(--b);margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--c);margin-bottom:32px}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:32px}
+.metric{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:20px}
+.metric-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--c);margin-bottom:8px}
+.metric-value{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:1px;line-height:1}
+.mv{color:var(--v)}.my{color:var(--y)}.mr{color:var(--r)}.mb{color:#64B5F6}
+.metric-sub{font-size:11px;color:var(--c);margin-top:4px}
+.tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid rgba(255,255,255,.07)}
+.tab{padding:10px 20px;font-size:13px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--c);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:color .2s,border-color .2s;margin-bottom:-1px}
+.tab.act{color:var(--v);border-bottom-color:var(--v)}
+.tab-content{display:none}.tab-content.show{display:block}
+.table-wrap{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;overflow:hidden;overflow-x:auto}
+.table-header{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between}
+.table-title{font-weight:500;font-size:14px}
+.table-count{font-family:'Space Mono',monospace;font-size:10px;color:var(--c);letter-spacing:.1em}
+table{width:100%;border-collapse:collapse;min-width:600px}
+th{padding:10px 16px;text-align:left;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--c);border-bottom:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)}
+td{padding:12px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px}
+.bv{background:rgba(0,230,118,.1);color:var(--v);border:1px solid rgba(0,230,118,.2)}
+.by{background:rgba(255,214,0,.1);color:var(--y);border:1px solid rgba(255,214,0,.2)}
+.bb{background:rgba(100,181,246,.1);color:#64B5F6;border:1px solid rgba(100,181,246,.2)}
+.score-pill{font-family:'Bebas Neue',sans-serif;font-size:22px}
+.sa{color:var(--v)}.sm{color:var(--y)}.sb2{color:var(--r)}
+.link-vid{color:var(--v);text-decoration:none;font-size:12px}
+.link-vid:hover{opacity:.75}
+.empty{text-align:center;padding:48px;color:var(--c);font-size:13px}
+.search-bar{width:100%;background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:2px;padding:9px 14px;color:var(--b);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;margin-bottom:16px}
+.search-bar:focus{border-color:var(--v)}
+.btn-del{background:none;border:1px solid rgba(255,60,60,.2);color:var(--r);font-size:11px;padding:4px 10px;border-radius:2px;cursor:pointer;transition:background .2s}.btn-del:hover{background:rgba(255,60,60,.1)}
+.btn-dest{background:none;border:1px solid rgba(0,230,118,.2);color:var(--v);font-size:11px;padding:4px 10px;border-radius:2px;cursor:pointer;transition:background .2s}.btn-dest:hover{background:rgba(0,230,118,.1)}
+.acoes{display:flex;gap:6px}
+.notif{position:fixed;bottom:24px;right:24px;background:var(--p2);border:1px solid rgba(0,230,118,.3);border-radius:4px;padding:12px 18px;font-size:13px;color:var(--v);z-index:999;transform:translateY(80px);opacity:0;transition:.3s}
+.notif.show{transform:translateY(0);opacity:1}
+@media(max-width:900px){.metrics{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.metrics{grid-template-columns:1fr 1fr}nav{padding:12px 16px}.main{padding:20px 16px}}
+</style>
+</head>
+<body>
+<div class="loading" id="loading">
+  <div class="loading-logo">REVEL<span>A</span></div>
+  <div class="loading-bar"></div>
+</div>
+<div class="notif" id="notif"></div>
+<nav>
+  <a href="index.html" class="logo">REVEL<span>A</span></a>
+  <div class="nav-right">
+    <span class="admin-badge">⚡ Admin</span>
+    <span style="font-size:12px;color:var(--c)" id="adminEmail">—</span>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </div>
+</nav>
+<main class="main">
+  <div class="page-title">Painel Admin</div>
+  <p class="page-sub" id="dataHoje">Carregando dados...</p>
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Atletas</div><div class="metric-value mv" id="mAtletas">—</div><div class="metric-sub">cadastrados</div></div>
+    <div class="metric"><div class="metric-label">Olheiros</div><div class="metric-value mb" id="mOlheiros">—</div><div class="metric-sub">cadastrados</div></div>
+    <div class="metric"><div class="metric-label">Vídeos</div><div class="metric-value my" id="mVideos">—</div><div class="metric-sub">enviados</div></div>
+    <div class="metric"><div class="metric-label">Analisados IA</div><div class="metric-value mv" id="mIA">—</div><div class="metric-sub">com relatório</div></div>
+    <div class="metric"><div class="metric-label">Score Médio</div><div class="metric-value my" id="mScore">—</div><div class="metric-sub">geral plataforma</div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab act" onclick="switchTab('atletas',this)">⚽ Atletas</button>
+    <button class="tab" onclick="switchTab('olheiros',this)">👁️ Olheiros</button>
+    <button class="tab" onclick="switchTab('videos',this)">🎬 Vídeos</button>
+    <button class="tab" onclick="switchTab('usuarios',this)">👥 Usuários</button>
+  </div>
+  <div class="tab-content show" id="tab-atletas">
+    <input class="search-bar" placeholder="🔍 Buscar por nome, cidade, estado ou posição..." oninput="filtrarAtletas(this.value)">
+    <div class="table-wrap">
+      <div class="table-header"><span class="table-title">Atletas cadastrados</span><span class="table-count" id="countAtletas">—</span></div>
+      <div id="tblAtletas"><div class="empty">Carregando...</div></div>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-olheiros">
+    <div class="table-wrap">
+      <div class="table-header"><span class="table-title">Olheiros e clubes</span><span class="table-count" id="countOlheiros">—</span></div>
+      <div id="tblOlheiros"><div class="empty">Carregando...</div></div>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-videos">
+    <div class="table-wrap">
+      <div class="table-header"><span class="table-title">Vídeos enviados</span><span class="table-count" id="countVideos">—</span></div>
+      <div id="tblVideos"><div class="empty">Carregando...</div></div>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-usuarios">
+    <div class="table-wrap">
+      <div class="table-header"><span class="table-title">Todos os usuários</span><span class="table-count" id="countUsuarios">—</span></div>
+      <div id="tblUsuarios"><div class="empty">Carregando...</div></div>
+    </div>
+  </div>
+</main>
+<script>
+const ADMIN='guilhermeanalistaagencia@gmail.com';
+const SURL='https://yrthxqmzuwurgthdfozx.supabase.co';
+const SKEY='sb_publishable_sPcnhj8prRj6UagRwFqrUA_73ZeFxC5';
+const {createClient}=supabase;
+const sb=createClient(SURL,SKEY);
+let todosAtletas=[];
+
+function notif(m){const e=document.getElementById('notif');e.textContent=m;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),3000)}
+function switchTab(n,btn){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('show'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('act'));document.getElementById('tab-'+n).classList.add('show');btn.classList.add('act')}
+
+async function init(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session||session.user.email!==ADMIN){window.location.href='index.html';return;}
+  document.getElementById('adminEmail').textContent=session.user.email;
+  document.getElementById('dataHoje').textContent='Última atualização: '+new Date().toLocaleString('pt-BR');
+  await Promise.all([carregarAtletas(),carregarOlheiros(),carregarVideos(),carregarUsuarios()]);
+  document.getElementById('loading').style.display='none';
+}
+
+async function carregarAtletas(){
+  const{data}=await sb.from('atletas').select('*').order('criado_em',{ascending:false});
+  todosAtletas=data||[];
+  document.getElementById('mAtletas').textContent=todosAtletas.length;
+  document.getElementById('countAtletas').textContent=todosAtletas.length+' atletas';
+  renderAtletas(todosAtletas);
+}
+
+function renderAtletas(lista){
+  const el=document.getElementById('tblAtletas');
+  if(!lista.length){el.innerHTML='<div class="empty">Nenhum atleta cadastrado ainda.</div>';return;}
+  el.innerHTML=`<table><thead><tr><th>Nome</th><th>Posição</th><th>Cidade</th><th>Estado</th><th>Nascimento</th><th>Cadastro</th><th>Ações</th></tr></thead><tbody>
+  ${lista.map(a=>`<tr>
+    <td><strong>${a.nome||'—'}</strong><br><span style="font-size:11px;color:var(--c)">${a.email||''}</span></td>
+    <td>${a.posicao?`<span class="badge bv">${a.posicao}</span>`:'—'}</td>
+    <td>${a.cidade||'—'}</td>
+    <td>${a.estado?`<span class="badge bb">${a.estado}</span>`:'—'}</td>
+    <td style="font-size:12px">${a.data_nascimento?new Date(a.data_nascimento).toLocaleDateString('pt-BR'):'—'}</td>
+    <td style="font-size:11px;color:var(--c)">${a.criado_em?new Date(a.criado_em).toLocaleDateString('pt-BR'):'—'}</td>
+    <td><div class="acoes">
+      <button class="btn-dest" onclick="destacar('${a.id}','${(a.nome||'').replace(/'/g,"\\'")}')">⭐</button>
+      <button class="btn-del" onclick="deletarAtleta('${a.id}','${(a.nome||'').replace(/'/g,"\\'")}')">Remover</button>
+    </div></td>
+  </tr>`).join('')}</tbody></table>`;
+}
+
+function filtrarAtletas(q){
+  if(!q){renderAtletas(todosAtletas);return;}
+  const f=q.toLowerCase();
+  renderAtletas(todosAtletas.filter(a=>(a.nome||'').toLowerCase().includes(f)||(a.cidade||'').toLowerCase().includes(f)||(a.estado||'').toLowerCase().includes(f)||(a.posicao||'').toLowerCase().includes(f)));
+}
+
+async function destacar(id,nome){
+  await sb.from('atletas').update({destacado:true}).eq('id',id);
+  notif('⭐ '+nome+' destacado!');
+}
+
+async function deletarAtleta(id,nome){
+  if(!confirm('Remover "'+nome+'"? Ação irreversível.'))return;
+  await sb.from('videos').delete().eq('atleta_id',id);
+  await sb.from('atletas').delete().eq('id',id);
+  notif('✓ Atleta removido.');
+  await carregarAtletas();
+}
+
+async function carregarOlheiros(){
+  const{data}=await sb.from('olheiros').select('*').order('criado_em',{ascending:false});
+  const lista=data||[];
+  document.getElementById('mOlheiros').textContent=lista.length;
+  document.getElementById('countOlheiros').textContent=lista.length+' olheiros';
+  const el=document.getElementById('tblOlheiros');
+  if(!lista.length){el.innerHTML='<div class="empty">Nenhum olheiro ainda.</div>';return;}
+  el.innerHTML=`<table><thead><tr><th>Nome</th><th>E-mail</th><th>Cidade</th><th>Estado</th><th>Cadastro</th></tr></thead><tbody>
+  ${lista.map(o=>`<tr>
+    <td><strong>${o.nome||'—'}</strong></td>
+    <td style="font-size:12px;color:var(--c)">${o.email||'—'}</td>
+    <td>${o.cidade||'—'}</td>
+    <td>${o.estado?`<span class="badge bb">${o.estado}</span>`:'—'}</td>
+    <td style="font-size:11px;color:var(--c)">${o.criado_em?new Date(o.criado_em).toLocaleDateString('pt-BR'):'—'}</td>
+  </tr>`).join('')}</tbody></table>`;
+}
+
+async function carregarVideos(){
+  const{data}=await sb.from('videos').select('*, atletas(nome,posicao,estado)').order('criado_em',{ascending:false});
+  const lista=data||[];
+  document.getElementById('mVideos').textContent=lista.length;
+  document.getElementById('countVideos').textContent=lista.length+' vídeos';
+  const comIA=lista.filter(v=>v.relatorio);
+  document.getElementById('mIA').textContent=comIA.length;
+  if(comIA.length>0){const med=Math.round(comIA.reduce((a,v)=>a+(v.relatorio?.score_geral||0),0)/comIA.length);document.getElementById('mScore').textContent=med;}
+  const el=document.getElementById('tblVideos');
+  if(!lista.length){el.innerHTML='<div class="empty">Nenhum vídeo ainda.</div>';return;}
+  el.innerHTML=`<table><thead><tr><th>Atleta</th><th>Posição</th><th>Estado</th><th>Descrição</th><th>Score IA</th><th>Vídeo</th><th>Data</th></tr></thead><tbody>
+  ${lista.map(v=>{
+    const s=v.relatorio?.score_geral;
+    const sc=s>=75?'sa':s>=50?'sm':'sb2';
+    return `<tr>
+      <td><strong>${v.atletas?.nome||'—'}</strong></td>
+      <td>${v.atletas?.posicao?`<span class="badge bv">${v.atletas.posicao}</span>`:'—'}</td>
+      <td>${v.atletas?.estado?`<span class="badge bb">${v.atletas.estado}</span>`:'—'}</td>
+      <td style="font-size:12px;color:var(--c)">${(v.descricao||'—').substring(0,50)}...</td>
+      <td>${s?`<span class="score-pill ${sc}">${s}</span>`:'<span style="font-size:11px;color:var(--c)">Pendente</span>'}</td>
+      <td><a href="${v.url}" target="_blank" class="link-vid">🎬 Ver</a></td>
+      <td style="font-size:11px;color:var(--c)">${v.criado_em?new Date(v.criado_em).toLocaleDateString('pt-BR'):'—'}</td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+async function carregarUsuarios(){
+  const{data:at}=await sb.from('atletas').select('id,nome,email,criado_em');
+  const{data:ol}=await sb.from('olheiros').select('id,nome,email,criado_em');
+  const todos=[...(at||[]).map(u=>({...u,tipo:'Atleta'})),...(ol||[]).map(u=>({...u,tipo:'Olheiro'}))].sort((a,b)=>new Date(b.criado_em)-new Date(a.criado_em));
+  document.getElementById('countUsuarios').textContent=todos.length+' usuários';
+  const el=document.getElementById('tblUsuarios');
+  if(!todos.length){el.innerHTML='<div class="empty">Nenhum usuário ainda.</div>';return;}
+  el.innerHTML=`<table><thead><tr><th>Nome</th><th>E-mail</th><th>Tipo</th><th>Cadastro</th></tr></thead><tbody>
+  ${todos.map(u=>`<tr>
+    <td><strong>${u.nome||'—'}</strong></td>
+    <td style="font-size:12px;color:var(--c)">${u.email||'—'}</td>
+    <td><span class="badge ${u.tipo==='Atleta'?'bv':'bb'}">${u.tipo}</span></td>
+    <td style="font-size:11px;color:var(--c)">${u.criado_em?new Date(u.criado_em).toLocaleDateString('pt-BR'):'—'}</td>
+  </tr>`).join('')}</tbody></table>`;
+}
+
+async function sair(){await sb.auth.signOut();window.location.href='index.html';}
+init();
+</script>
+</body>
+</html>
