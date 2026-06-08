@@ -8,140 +8,286 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--v:#00E676;--ve:#00B050;--p:#070A0B;--p2:#0E1315;--p3:#161D20;--c:#8A9399;--b:#F0F4F2}
-body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-height:100vh}
+:root{--v:#00E676;--ve:#00B050;--p:#070A0B;--p2:#0E1315;--p3:#161D20;--c:#8A9399;--b:#F0F4F2;--r:#ff6b6b;--y:#FFD600;--sidebar:240px}
+body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex}
+ 
+/* LOADING */
 .loading{position:fixed;inset:0;background:var(--p);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px}
 .loading-logo{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:8px}.loading-logo span{color:var(--v)}
 .loading-bar{width:200px;height:2px;background:rgba(255,255,255,.1);border-radius:1px;overflow:hidden}
-.loading-bar::after{content:'';display:block;height:100%;background:var(--v);animation:load 1.5s ease-in-out infinite}
-@keyframes load{0%{width:0%;transform:translateX(0)}50%{width:100%}100%{width:0%;transform:translateX(200px)}}
-nav{background:var(--p2);border-bottom:1px solid rgba(255,255,255,.06);padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;color:var(--b);text-decoration:none}.logo span{color:var(--v)}
-.nav-user{display:flex;align-items:center;gap:14px}
-.user-name{font-size:13px;color:var(--c)}
-.btn-sair{background:none;border:1px solid rgba(255,255,255,.1);color:var(--c);font-size:12px;padding:7px 14px;border-radius:2px;cursor:pointer;transition:border-color .2s,color .2s}.btn-sair:hover{border-color:rgba(255,60,60,.4);color:#ff6b6b}
-.main{max-width:900px;margin:0 auto;padding:40px 24px}
+.loading-bar::after{content:'';display:block;height:100%;background:var(--v);animation:ld 1.5s ease-in-out infinite}
+@keyframes ld{0%{width:0%;transform:translateX(0)}50%{width:100%}100%{width:0%;transform:translateX(200px)}}
+ 
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);min-height:100vh;background:var(--p2);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;transition:transform .3s}
+.sb-logo{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-logo a{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:6px;color:var(--b);text-decoration:none}.sb-logo a span{color:var(--v)}
+.sb-user{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-user-name{font-size:13px;font-weight:500;color:var(--b);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--v)}
+.sb-nav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:4px}
+.sb-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:8px 8px 4px;margin-top:8px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:4px;color:var(--c);text-decoration:none;font-size:13px;font-weight:500;transition:background .2s,color .2s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.sb-item:hover{background:rgba(255,255,255,.05);color:var(--b)}
+.sb-item.active{background:rgba(0,230,118,.1);color:var(--v)}
+.sb-item-icon{width:18px;height:18px;flex-shrink:0;opacity:.7}
+.sb-item.active .sb-item-icon{opacity:1}
+.sb-bottom{padding:16px 12px;border-top:1px solid rgba(255,255,255,.06)}
+.btn-sair{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:4px;color:var(--c);font-size:13px;font-weight:500;background:none;border:none;width:100%;cursor:pointer;transition:background .2s,color .2s}
+.btn-sair:hover{background:rgba(255,60,60,.08);color:var(--r)}
+ 
+/* TOGGLE MOBILE */
+.sb-toggle{display:none;position:fixed;top:16px;left:16px;z-index:60;background:var(--p2);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:8px;cursor:pointer;flex-direction:column;gap:4px}
+.sb-toggle span{width:18px;height:2px;background:var(--b);border-radius:1px;display:block;transition:.3s}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
+ 
+/* MAIN CONTENT */
+.main-wrap{margin-left:var(--sidebar);flex:1;min-height:100vh}
+.main{max-width:860px;margin:0 auto;padding:40px 32px}
 .page-title{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:1px;color:var(--b);margin-bottom:4px}
-.page-sub{font-size:14px;color:var(--c);margin-bottom:36px}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:36px}
-.card{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:22px}
-.card-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--c);margin-bottom:8px}
-.card-value{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:1px;color:var(--b)}
-.card-value.verde{color:var(--v)}
+.page-sub{font-size:14px;color:var(--c);margin-bottom:32px}
+ 
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.card{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:20px}
+.card-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--c);margin-bottom:8px}
+.card-value{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;color:var(--b)}
+.card-value.v{color:var(--v)}.card-value.y{color:var(--y)}
 .card-desc{font-size:11px;color:var(--c);margin-top:4px}
-.section-box{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:28px;margin-bottom:20px}
-.box-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.5px;color:var(--b);margin-bottom:4px}
-.box-sub{font-size:12px;color:var(--c);margin-bottom:22px}
-.perfil-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+ 
+/* SECTION BOX */
+.sbox{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:26px;margin-bottom:18px}
+.sbox-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.5px;color:var(--b);margin-bottom:3px}
+.sbox-sub{font-size:12px;color:var(--c);margin-bottom:20px}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .fg{margin-bottom:0}
 .fg label{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--c);margin-bottom:5px}
 .fg input,.fg select,.fg textarea{width:100%;background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:2px;padding:10px 12px;color:var(--b);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;-webkit-appearance:none}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--v)}
 .fg select option{background:var(--p3)}
 .fg textarea{resize:vertical;min-height:80px;line-height:1.5}
-.btn-salvar{background:var(--v);color:var(--p);font-weight:500;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border:none;border-radius:2px;cursor:pointer;transition:background .2s,transform .2s;margin-top:16px}
-.btn-salvar:hover{background:var(--ve);transform:translateY(-1px)}.btn-salvar:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.fg-link{margin-bottom:16px}
-.fg-link label{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--c);margin-bottom:5px}
-.fg-link input,.fg-link textarea{width:100%;background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:2px;padding:10px 12px;color:var(--b);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
-.fg-link input:focus,.fg-link textarea:focus{border-color:var(--v)}
-.fg-link textarea{resize:vertical;min-height:80px;line-height:1.5}
-.videos-list{display:flex;flex-direction:column;gap:14px;margin-top:16px}
-.video-item{background:var(--p3);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:18px}
-.vi-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
-.vi-info{flex:1}
-.vi-title{font-size:13px;font-weight:500;color:var(--b);margin-bottom:4px}
-.vi-meta{font-size:11px;color:var(--c)}
-.vi-status{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px;flex-shrink:0}
-.status-analisando{background:rgba(255,214,0,.1);color:#FFD600;border:1px solid rgba(255,214,0,.2)}
-.status-ok{background:rgba(0,230,118,.1);color:var(--v);border:1px solid rgba(0,230,118,.2)}
-/* RELATÓRIO IA */
-.ai-report{margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px}
-.ai-report-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--v);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.ai-report-title::before{content:'🤖'}
-.scores-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.score-item{background:var(--p2);border-radius:2px;padding:10px 12px;text-align:center}
-.score-label{font-size:10px;color:var(--c);margin-bottom:4px;letter-spacing:.05em}
-.score-value{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1}
-.score-value.alto{color:var(--v)}
-.score-value.medio{color:#FFD600}
-.score-value.baixo{color:#ff6b6b}
-.ai-texto{font-size:12px;color:var(--c);line-height:1.7;background:var(--p2);padding:12px 14px;border-radius:2px;border-left:2px solid var(--v)}
-.ai-pontos{margin-top:10px;display:flex;flex-direction:column;gap:6px}
-.ai-ponto{font-size:12px;color:var(--c);display:flex;gap:8px}
-.ai-ponto.pos{color:rgba(0,230,118,.85)}
-.ai-ponto.neg{color:rgba(255,107,107,.85)}
-/* ANALISANDO */
-.ai-loading{display:flex;align-items:center;gap:10px;padding:14px;background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.15);border-radius:2px;margin-top:10px}
-.ai-loading-dot{width:8px;height:8px;background:var(--v);border-radius:50%;animation:pulse 1s ease-in-out infinite}
-.ai-loading-dot:nth-child(2){animation-delay:.2s}
-.ai-loading-dot:nth-child(3){animation-delay:.4s}
-@keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
-.ai-loading-text{font-size:12px;color:var(--v)}
-.msg{padding:10px 14px;border-radius:2px;font-size:12px;margin-top:12px;display:none}
-.msg.err{background:rgba(255,60,60,.09);border:1px solid rgba(255,60,60,.28);color:#ff6b6b;display:block}
+.flink{margin-bottom:14px}
+.flink label{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--c);margin-bottom:5px}
+.flink input,.flink textarea{width:100%;background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:2px;padding:10px 12px;color:var(--b);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+.flink input:focus,.flink textarea:focus{border-color:var(--v)}
+.flink textarea{resize:vertical;min-height:80px;line-height:1.5}
+.btn-save{background:var(--v);color:var(--p);font-weight:500;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:11px 22px;border:none;border-radius:2px;cursor:pointer;transition:background .2s,transform .2s;margin-top:14px}
+.btn-save:hover{background:var(--ve);transform:translateY(-1px)}.btn-save:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.hint{font-size:11px;color:var(--c);margin-top:5px;font-style:italic}
+.msg{padding:10px 14px;border-radius:2px;font-size:12px;margin-top:10px;display:none}
+.msg.err{background:rgba(255,60,60,.09);border:1px solid rgba(255,60,60,.28);color:var(--r);display:block}
 .msg.ok{background:rgba(0,230,118,.09);border:1px solid rgba(0,230,118,.28);color:var(--v);display:block}
-.empty-state{text-align:center;padding:32px;color:var(--c);font-size:13px}
-.hint{font-size:11px;color:var(--c);margin-top:6px;font-style:italic}
-@media(max-width:600px){.cards{grid-template-columns:1fr 1fr}.perfil-grid{grid-template-columns:1fr}.scores-grid{grid-template-columns:1fr 1fr}nav{padding:14px 16px}.main{padding:24px 16px}}
+ 
+/* VÍDEOS */
+.vlist{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.vitem{background:var(--p3);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:16px}
+.vi-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.vi-title{font-size:13px;font-weight:500;color:var(--b);margin-bottom:3px}
+.vi-meta{font-size:11px;color:var(--c)}
+.vi-badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px;flex-shrink:0}
+.badge-ok{background:rgba(0,230,118,.1);color:var(--v);border:1px solid rgba(0,230,118,.2)}
+.badge-pend{background:rgba(255,214,0,.1);color:var(--y);border:1px solid rgba(255,214,0,.2)}
+ 
+/* AI REPORT */
+.ai-rep{margin-top:12px;border-top:1px solid rgba(255,255,255,.06);padding-top:12px}
+.ai-rep-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--v);margin-bottom:10px}
+.scores-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.si{background:var(--p2);border-radius:2px;padding:9px;text-align:center}
+.si-label{font-size:10px;color:var(--c);margin-bottom:3px}
+.si-val{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1}
+.sv-a{color:var(--v)}.sv-m{color:var(--y)}.sv-b{color:var(--r)}
+.ai-txt{font-size:12px;color:var(--c);line-height:1.7;background:var(--p2);padding:10px 12px;border-radius:2px;border-left:2px solid var(--v);margin-bottom:10px}
+.ai-pts{display:flex;flex-direction:column;gap:5px}
+.ai-pt{font-size:12px;display:flex;gap:7px}.ai-pt.pos{color:rgba(0,230,118,.85)}.ai-pt.neg{color:rgba(255,107,107,.8)}
+.empty{text-align:center;padding:28px;color:var(--c);font-size:13px}
+ 
+/* SUPORTE */
+.suporte-opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
+.suporte-card{background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:22px;text-align:center;cursor:pointer;text-decoration:none;transition:border-color .3s,transform .2s;display:flex;flex-direction:column;align-items:center;gap:10px}
+.suporte-card:hover{border-color:rgba(0,230,118,.3);transform:translateY(-2px)}
+.suporte-icon{font-size:32px}
+.suporte-title{font-weight:500;font-size:14px;color:var(--b)}
+.suporte-desc{font-size:12px;color:var(--c);line-height:1.5}
+ 
+/* PLANO */
+.plano-atual{background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.2);border-radius:4px;padding:24px;margin-bottom:16px}
+.plano-nome{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--v);margin-bottom:4px}
+.plano-preco{font-size:22px;font-weight:500;color:var(--b);margin-bottom:8px}
+.plano-desc{font-size:13px;color:var(--c);line-height:1.6}
+ 
+/* TABS CONTEUDO */
+.tab-sec{display:none}.tab-sec.show{display:block}
+ 
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .sb-toggle{display:flex}.sb-overlay.show{display:block}
+  .main-wrap{margin-left:0}.main{padding:24px 16px}
+  .pgrid{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}
+  .suporte-opts{grid-template-columns:1fr}.scores-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){.cards{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="loading" id="loading">
-  <div class="loading-logo">REVEL<span>A</span></div>
-  <div class="loading-bar"></div>
+<div class="loading" id="loading"><div class="loading-logo">REVEL<span>A</span></div><div class="loading-bar"></div></div>
+ 
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo"><a href="index.html">REVEL<span>A</span></a></div>
+  <div class="sb-user">
+    <div class="sb-user-name" id="sbNome">—</div>
+    <div class="sb-user-role">Atleta</div>
+  </div>
+  <nav class="sb-nav">
+    <span class="sb-label">Menu</span>
+    <button class="sb-item active" onclick="irPara('perfil',this)">
+      <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Meu Perfil
+    </button>
+    <button class="sb-item" onclick="irPara('videos',this)">
+      <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+      Meus Vídeos
+    </button>
+    <span class="sb-label">Plataforma</span>
+    <a class="sb-item" href="index.html">
+      <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Início
+    </a>
+    <button class="sb-item" onclick="irPara('plano',this)">
+      <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Meu Plano
+    </button>
+    <button class="sb-item" onclick="irPara('suporte',this)">
+      <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Suporte
+    </button>
+  </nav>
+  <div class="sb-bottom">
+    <button class="btn-sair" onclick="sair()">
+      <svg style="width:16px;height:16px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sair
+    </button>
+  </div>
+</aside>
+ 
+<!-- OVERLAY MOBILE -->
+<div class="sb-overlay" id="sbOverlay" onclick="closeSb()"></div>
+ 
+<!-- TOGGLE MOBILE -->
+<button class="sb-toggle" id="sbToggle" onclick="toggleSb()">
+  <span></span><span></span><span></span>
+</button>
+ 
+<!-- CONTEÚDO PRINCIPAL -->
+<div class="main-wrap">
+  <div class="main">
+ 
+    <!-- PERFIL -->
+    <div class="tab-sec show" id="sec-perfil">
+      <div class="page-title">Meu Perfil</div>
+      <p class="page-sub">Mantenha seus dados atualizados para aparecer nas buscas dos olheiros.</p>
+      <div class="cards">
+        <div class="card"><div class="card-label">Visualizações</div><div class="card-value v" id="statViews">0</div><div class="card-desc">clubes viram seu perfil</div></div>
+        <div class="card"><div class="card-label">Vídeos</div><div class="card-value" id="statVids">0</div><div class="card-desc">enviados</div></div>
+        <div class="card"><div class="card-label">Score médio</div><div class="card-value y" id="statScore">—</div><div class="card-desc">avaliação da IA</div></div>
+      </div>
+      <div class="sbox">
+        <div class="sbox-title">Dados pessoais</div>
+        <p class="sbox-sub">Essas informações aparecem para os olheiros ao visualizar seu perfil.</p>
+        <div class="pgrid">
+          <div class="fg"><label>Nome completo</label><input type="text" id="pNome" placeholder="Seu nome"></div>
+          <div class="fg"><label>Data de nascimento</label><input type="date" id="pData"></div>
+          <div class="fg"><label>Estado</label><select id="pEst"><option value="">Selecione</option><option>AC</option><option>AL</option><option>AM</option><option>AP</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MG</option><option>MS</option><option>MT</option><option>PA</option><option>PB</option><option>PE</option><option>PI</option><option>PR</option><option>RJ</option><option>RN</option><option>RO</option><option>RR</option><option>RS</option><option>SC</option><option>SE</option><option>SP</option><option>TO</option></select></div>
+          <div class="fg"><label>Cidade</label><input type="text" id="pCid" placeholder="Sua cidade"></div>
+          <div class="fg"><label>Posição</label><select id="pPos"><option value="">Selecione</option><option>Goleiro</option><option>Lateral Direito</option><option>Lateral Esquerdo</option><option>Zagueiro</option><option>Volante</option><option>Meia</option><option>Atacante</option><option>Ponta Direita</option><option>Ponta Esquerda</option></select></div>
+          <div class="fg"><label>Altura (cm)</label><input type="number" id="pAltura" placeholder="Ex: 175"></div>
+        </div>
+        <div id="msgPerfil" class="msg"></div>
+        <button class="btn-save" id="btnPerfil" onclick="salvarPerfil()">Salvar perfil</button>
+      </div>
+    </div>
+ 
+    <!-- VÍDEOS -->
+    <div class="tab-sec" id="sec-videos">
+      <div class="page-title">Meus Vídeos</div>
+      <p class="page-sub">Envie seus vídeos e deixe a IA gerar um relatório completo para os olheiros.</p>
+      <div class="sbox">
+        <div class="sbox-title">Enviar novo vídeo</div>
+        <p class="sbox-sub">Cole o link e descreva o vídeo — quanto mais detalhes, melhor a análise.</p>
+        <div class="flink"><label>Link do vídeo (YouTube ou Instagram) *</label><input type="url" id="vLink" placeholder="https://youtube.com/watch?v=..."></div>
+        <div class="flink">
+          <label>Descreva o vídeo *</label>
+          <textarea id="vDesc" placeholder="Ex: Jogo do campeonato estadual sub-17. Estou jogando de atacante, mostro velocidade, gol de cabeça e marcação..."></textarea>
+          <p class="hint">💡 Descreva sua posição, habilidades mostradas e contexto do jogo.</p>
+        </div>
+        <div id="msgVideo" class="msg"></div>
+        <button class="btn-save" id="btnVideo" onclick="enviarVideo()">🤖 Enviar e analisar com IA</button>
+      </div>
+      <div class="sbox">
+        <div class="sbox-title">Vídeos enviados</div>
+        <p class="sbox-sub">Seus vídeos com análise de IA disponíveis para os olheiros.</p>
+        <div class="vlist" id="videosList"><div class="empty">Nenhum vídeo enviado ainda.</div></div>
+      </div>
+    </div>
+ 
+    <!-- PLANO -->
+    <div class="tab-sec" id="sec-plano">
+      <div class="page-title">Meu Plano</div>
+      <p class="page-sub">Gerencie sua assinatura e acesso à plataforma.</p>
+      <div class="sbox">
+        <div class="sbox-title">Plano atual</div>
+        <div class="plano-atual">
+          <div class="plano-nome">Atleta Pro</div>
+          <div class="plano-preco">R$ 19,90<span style="font-size:14px;font-weight:300;color:var(--c)">/mês</span></div>
+          <div class="plano-desc">✓ Perfil visível para todos os olheiros<br>✓ Envio ilimitado de vídeos<br>✓ Análise de IA em cada vídeo<br>✓ Notificação quando clube visualizar</div>
+        </div>
+        <p style="font-size:13px;color:var(--c)">Integração com pagamento em breve. Em caso de dúvidas, entre em contato pelo suporte.</p>
+      </div>
+    </div>
+ 
+    <!-- SUPORTE -->
+    <div class="tab-sec" id="sec-suporte">
+      <div class="page-title">Suporte</div>
+      <p class="page-sub">Fale conosco — estamos aqui para ajudar você a ser descoberto.</p>
+      <div class="sbox">
+        <div class="sbox-title">Como podemos ajudar?</div>
+        <p class="sbox-sub">Escolha o canal de atendimento:</p>
+        <div class="suporte-opts">
+          <a href="https://wa.me/5500000000000?text=Olá! Sou atleta no Revela e preciso de ajuda." target="_blank" class="suporte-card">
+            <div class="suporte-icon">💬</div>
+            <div class="suporte-title">WhatsApp</div>
+            <div class="suporte-desc">Atendimento rápido via WhatsApp. Resposta em até 24h.</div>
+          </a>
+          <a href="mailto:contato@revelabrasil.com.br" class="suporte-card">
+            <div class="suporte-icon">✉️</div>
+            <div class="suporte-title">E-mail</div>
+            <div class="suporte-desc">Envie sua dúvida por e-mail. Resposta em até 48h.</div>
+          </a>
+        </div>
+      </div>
+      <div class="sbox">
+        <div class="sbox-title">Dúvidas frequentes</div>
+        <p class="sbox-sub">Perguntas mais comuns dos atletas:</p>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
+          <div style="background:var(--p3);border-radius:4px;padding:16px">
+            <div style="font-weight:500;font-size:13px;margin-bottom:6px">Como enviar meu vídeo?</div>
+            <div style="font-size:12px;color:var(--c);line-height:1.6">Vá em "Meus Vídeos", cole o link do YouTube ou Instagram e descreva o vídeo. A IA analisa automaticamente.</div>
+          </div>
+          <div style="background:var(--p3);border-radius:4px;padding:16px">
+            <div style="font-weight:500;font-size:13px;margin-bottom:6px">Os olheiros podem me ver?</div>
+            <div style="font-size:12px;color:var(--c);line-height:1.6">Sim! Com o plano ativo, seu perfil aparece para todos os olheiros e clubes cadastrados na plataforma.</div>
+          </div>
+          <div style="background:var(--p3);border-radius:4px;padding:16px">
+            <div style="font-weight:500;font-size:13px;margin-bottom:6px">Como funciona a análise de IA?</div>
+            <div style="font-size:12px;color:var(--c);line-height:1.6">Nossa IA analisa a descrição do vídeo e gera scores de técnica, físico, tático e potencial — como um scout profissional.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+  </div>
 </div>
-<nav>
-  <a href="index.html" class="logo">REVEL<span>A</span></a>
-  <div class="nav-user">
-    <span class="user-name" id="userEmail">—</span>
-    <button class="btn-sair" onclick="sair()">Sair</button>
-  </div>
-</nav>
-<main class="main">
-  <div class="page-title">Meu Painel</div>
-  <p class="page-sub">Bem-vindo ao Revela — gerencie seu perfil e deixe a IA analisar seus vídeos.</p>
-  <div class="cards">
-    <div class="card"><div class="card-label">Visualizações</div><div class="card-value verde" id="statViews">0</div><div class="card-desc">clubes viram seu perfil</div></div>
-    <div class="card"><div class="card-label">Vídeos enviados</div><div class="card-value" id="statVids">0</div><div class="card-desc">disponíveis para olheiros</div></div>
-    <div class="card"><div class="card-label">Score médio</div><div class="card-value verde" id="statScore">—</div><div class="card-desc">avaliação da IA</div></div>
-  </div>
-
-  <!-- PERFIL -->
-  <div class="section-box">
-    <div class="box-title">Meu Perfil</div>
-    <p class="box-sub">Mantenha seus dados atualizados para aparecer nas buscas dos olheiros.</p>
-    <div class="perfil-grid">
-      <div class="fg"><label>Nome completo</label><input type="text" id="pNome" placeholder="Seu nome"></div>
-      <div class="fg"><label>Data de nascimento</label><input type="date" id="pData"></div>
-      <div class="fg"><label>Estado</label><select id="pEst"><option value="">Selecione</option><option>AC</option><option>AL</option><option>AM</option><option>AP</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MG</option><option>MS</option><option>MT</option><option>PA</option><option>PB</option><option>PE</option><option>PI</option><option>PR</option><option>RJ</option><option>RN</option><option>RO</option><option>RR</option><option>RS</option><option>SC</option><option>SE</option><option>SP</option><option>TO</option></select></div>
-      <div class="fg"><label>Cidade</label><input type="text" id="pCid" placeholder="Sua cidade"></div>
-      <div class="fg"><label>Posição</label><select id="pPos"><option value="">Selecione</option><option>Goleiro</option><option>Lateral Direito</option><option>Lateral Esquerdo</option><option>Zagueiro</option><option>Volante</option><option>Meia</option><option>Atacante</option><option>Ponta Direita</option><option>Ponta Esquerda</option></select></div>
-      <div class="fg"><label>Altura (cm)</label><input type="number" id="pAltura" placeholder="Ex: 175"></div>
-    </div>
-    <div id="msgPerfil" class="msg"></div>
-    <button class="btn-salvar" id="btnPerfil" onclick="salvarPerfil()">Salvar perfil</button>
-  </div>
-
-  <!-- VÍDEOS + IA -->
-  <div class="section-box">
-    <div class="box-title">Enviar Vídeo + Análise IA</div>
-    <p class="box-sub">Cole o link do vídeo e descreva o que acontece — a IA gera um relatório completo para os olheiros.</p>
-
-    <div class="fg-link"><label>Link do vídeo (YouTube ou Instagram) *</label><input type="url" id="vLink" placeholder="https://youtube.com/watch?v=..."></div>
-    <div class="fg-link">
-      <label>Descreva o que aparece no vídeo *</label>
-      <textarea id="vDesc" placeholder="Ex: Jogo do campeonato estadual sub-17. Estou jogando de atacante pelo lado esquerdo. Mostro minha velocidade em duas jogadas individuais, um gol de cabeça e minha marcação no campo deles. O jogo foi em campo de grama natural..."></textarea>
-      <p class="hint">💡 Quanto mais detalhes você der, melhor será a análise da IA. Fale sobre sua posição, habilidades que aparece, contexto do jogo.</p>
-    </div>
-
-    <div id="msgVideo" class="msg"></div>
-    <button class="btn-salvar" id="btnVideo" onclick="enviarVideo()">🤖 Enviar e analisar com IA</button>
-
-    <div class="videos-list" id="videosList"><div class="empty-state">Nenhum vídeo enviado ainda.</div></div>
-  </div>
-</main>
-
+ 
 <script>
 const SURL='https://yrthxqmzuwurgthdfozx.supabase.co';
 const SKEY='sb_publishable_sPcnhj8prRj6UagRwFqrUA_73ZeFxC5';
@@ -149,19 +295,34 @@ const OR_KEY='sk-or-v1-1eb129fd0e73b968f6a243ab92df2fe833cd37c8eb935d5dfa16c7f56
 const {createClient}=supabase;
 const sb=createClient(SURL,SKEY);
 let userId=null;
-
+ 
+// SIDEBAR
+function toggleSb(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sbOverlay').classList.toggle('show')}
+function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('show')}
+ 
+function irPara(sec,btn){
+  document.querySelectorAll('.tab-sec').forEach(s=>s.classList.remove('show'));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+sec).classList.add('show');
+  if(btn)btn.classList.add('active');
+  closeSb();
+  window.scrollTo(0,0);
+}
+ 
 function showMsg(id,m,t){const e=document.getElementById(id);e.textContent=m;e.className='msg '+t;setTimeout(()=>{e.className='msg'},5000)}
-
+function scCls(s){return s>=75?'sv-a':s>=50?'sv-m':'sv-b'}
+ 
 async function init(){
   const{data:{session}}=await sb.auth.getSession();
   if(!session){window.location.href='index.html';return;}
   userId=session.user.id;
-  document.getElementById('userEmail').textContent=session.user.email;
+  const nome=session.user.user_metadata?.nome||session.user.email.split('@')[0];
+  document.getElementById('sbNome').textContent=nome;
   await carregarPerfil();
   await carregarVideos();
   document.getElementById('loading').style.display='none';
 }
-
+ 
 async function carregarPerfil(){
   const{data}=await sb.from('atletas').select('*').eq('id',userId).single();
   if(data){
@@ -171,9 +332,10 @@ async function carregarPerfil(){
     document.getElementById('pCid').value=data.cidade||'';
     document.getElementById('pPos').value=data.posicao||'';
     document.getElementById('pAltura').value=data.altura||'';
+    if(data.nome)document.getElementById('sbNome').textContent=data.nome;
   }
 }
-
+ 
 async function salvarPerfil(){
   const btn=document.getElementById('btnPerfil');
   btn.disabled=true;btn.textContent='Salvando...';
@@ -187,147 +349,83 @@ async function salvarPerfil(){
     altura:document.getElementById('pAltura').value||null,
     atualizado_em:new Date().toISOString()
   });
-  if(error)showMsg('msgPerfil','Erro ao salvar: '+error.message,'err');
-  else showMsg('msgPerfil','✓ Perfil salvo com sucesso!','ok');
+  if(error)showMsg('msgPerfil','Erro: '+error.message,'err');
+  else{showMsg('msgPerfil','✓ Perfil salvo!','ok');await carregarPerfil();}
   btn.disabled=false;btn.textContent='Salvar perfil';
 }
-
-// ============ ANÁLISE IA ============
-async function analisarComIA(url, descricao, posicao){
-  const prompt = `Você é um analista de scouting de futebol experiente. Analise este atleta com base nas informações fornecidas e gere um relatório técnico objetivo.
-
-INFORMAÇÕES DO ATLETA:
-- Link do vídeo: ${url}
-- Posição: ${posicao || 'Não informada'}
-- Descrição do vídeo: ${descricao}
-
-Responda APENAS com um JSON válido neste formato exato:
-{
-  "score_geral": 75,
-  "score_tecnica": 72,
-  "score_fisico": 78,
-  "score_tatico": 71,
-  "score_potencial": 80,
-  "resumo": "Texto de 2-3 frases resumindo o atleta para um olheiro profissional.",
-  "pontos_positivos": ["ponto 1", "ponto 2", "ponto 3"],
-  "pontos_atencao": ["ponto 1", "ponto 2"],
-  "recomendacao": "Recomendado para observação" 
-}
-
-Os scores devem ser de 0 a 100. Seja objetivo e técnico como um scout profissional.`;
-
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${OR_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://revela-eight.vercel.app',
-      'X-Title': 'Revela Brasil'
-    },
-    body: JSON.stringify({
-      model: 'meta-llama/llama-3.1-8b-instruct:free',
-      messages: [{role: 'user', content: prompt}],
-      max_tokens: 800
-    })
-  });
-
-  const data = await res.json();
-  const texto = data.choices?.[0]?.message?.content || '';
-  const jsonMatch = texto.match(/\{[\s\S]*\}/);
-  if(!jsonMatch) throw new Error('IA não retornou análise válida');
-  return JSON.parse(jsonMatch[0]);
-}
-
-function scoreClass(s){return s>=75?'alto':s>=50?'medio':'baixo'}
-
-function renderRelatorio(r){
-  if(!r) return '';
-  return `<div class="ai-report">
-    <div class="ai-report-title">Análise de IA — Scout Digital</div>
-    <div class="scores-grid">
-      <div class="score-item"><div class="score-label">Score Geral</div><div class="score-value ${scoreClass(r.score_geral)}">${r.score_geral}</div></div>
-      <div class="score-item"><div class="score-label">Técnica</div><div class="score-value ${scoreClass(r.score_tecnica)}">${r.score_tecnica}</div></div>
-      <div class="score-item"><div class="score-label">Físico</div><div class="score-value ${scoreClass(r.score_fisico)}">${r.score_fisico}</div></div>
-      <div class="score-item"><div class="score-label">Tático</div><div class="score-value ${scoreClass(r.score_tatico)}">${r.score_tatico}</div></div>
-      <div class="score-item"><div class="score-label">Potencial</div><div class="score-value ${scoreClass(r.score_potencial)}">${r.score_potencial}</div></div>
-      <div class="score-item"><div class="score-label">Recomendação</div><div style="font-size:10px;color:var(--v);margin-top:6px;line-height:1.3">${r.recomendacao||'—'}</div></div>
-    </div>
-    <div class="ai-texto">${r.resumo||''}</div>
-    <div class="ai-pontos">
-      ${(r.pontos_positivos||[]).map(p=>`<div class="ai-ponto pos">✓ ${p}</div>`).join('')}
-      ${(r.pontos_atencao||[]).map(p=>`<div class="ai-ponto neg">⚠ ${p}</div>`).join('')}
-    </div>
-  </div>`;
-}
-
+ 
 async function carregarVideos(){
   const{data}=await sb.from('videos').select('*').eq('atleta_id',userId).order('criado_em',{ascending:false});
-  const lista=document.getElementById('videosList');
   document.getElementById('statVids').textContent=data?.length||0;
-
-  // Calcula score médio
-  const comScore = (data||[]).filter(v=>v.relatorio?.score_geral);
+  const comScore=(data||[]).filter(v=>v.relatorio?.score_geral);
   if(comScore.length>0){
-    const media = Math.round(comScore.reduce((a,v)=>a+v.relatorio.score_geral,0)/comScore.length);
-    document.getElementById('statScore').textContent=media;
+    const med=Math.round(comScore.reduce((a,v)=>a+v.relatorio.score_geral,0)/comScore.length);
+    document.getElementById('statScore').textContent=med;
   }
-
-  if(!data||data.length===0){lista.innerHTML='<div class="empty-state">Nenhum vídeo enviado ainda. Envie seu primeiro vídeo acima!</div>';return;}
+  const lista=document.getElementById('videosList');
+  if(!data||!data.length){lista.innerHTML='<div class="empty">Nenhum vídeo enviado ainda.</div>';return;}
   lista.innerHTML=data.map(v=>`
-    <div class="video-item">
-      <div class="vi-header">
+    <div class="vitem">
+      <div class="vi-hd">
         <div class="vi-info">
-          <div class="vi-title">${v.descricao?.substring(0,60)||'Vídeo sem descrição'}...</div>
+          <div class="vi-title">${(v.descricao||'Vídeo').substring(0,60)}...</div>
           <div class="vi-meta"><a href="${v.url}" target="_blank" style="color:var(--v);text-decoration:none">🎬 Ver vídeo</a> · ${new Date(v.criado_em).toLocaleDateString('pt-BR')}</div>
         </div>
-        <span class="vi-status ${v.relatorio?'status-ok':'status-analisando'}">${v.relatorio?'Analisado':'Pendente'}</span>
+        <span class="vi-badge ${v.relatorio?'badge-ok':'badge-pend'}">${v.relatorio?'Analisado':'Pendente'}</span>
       </div>
-      ${v.relatorio ? renderRelatorio(v.relatorio) : '<div style="font-size:12px;color:var(--c);margin-top:8px">⏳ Aguardando análise da IA...</div>'}
+      ${v.relatorio?`
+      <div class="ai-rep">
+        <div class="ai-rep-title">🤖 Análise de IA</div>
+        <div class="scores-grid">
+          <div class="si"><div class="si-label">Geral</div><div class="si-val ${scCls(v.relatorio.score_geral)}">${v.relatorio.score_geral}</div></div>
+          <div class="si"><div class="si-label">Técnica</div><div class="si-val ${scCls(v.relatorio.score_tecnica)}">${v.relatorio.score_tecnica}</div></div>
+          <div class="si"><div class="si-label">Físico</div><div class="si-val ${scCls(v.relatorio.score_fisico)}">${v.relatorio.score_fisico}</div></div>
+          <div class="si"><div class="si-label">Tático</div><div class="si-val ${scCls(v.relatorio.score_tatico)}">${v.relatorio.score_tatico}</div></div>
+          <div class="si"><div class="si-label">Potencial</div><div class="si-val ${scCls(v.relatorio.score_potencial)}">${v.relatorio.score_potencial}</div></div>
+          <div class="si"><div class="si-label">Recomendação</div><div style="font-size:10px;color:var(--v);margin-top:4px;line-height:1.3">${v.relatorio.recomendacao||'—'}</div></div>
+        </div>
+        <div class="ai-txt">${v.relatorio.resumo||''}</div>
+        <div class="ai-pts">
+          ${(v.relatorio.pontos_positivos||[]).map(p=>`<div class="ai-pt pos">✓ ${p}</div>`).join('')}
+          ${(v.relatorio.pontos_atencao||[]).map(p=>`<div class="ai-pt neg">⚠ ${p}</div>`).join('')}
+        </div>
+      </div>`:''}
     </div>`).join('');
 }
-
+ 
+async function analisarComIA(url,desc,pos){
+  const prompt=`Você é um analista de scouting de futebol. Analise este atleta e responda APENAS com JSON válido:\n{"score_geral":75,"score_tecnica":72,"score_fisico":78,"score_tatico":71,"score_potencial":80,"resumo":"Resumo de 2-3 frases.","pontos_positivos":["ponto1","ponto2","ponto3"],"pontos_atencao":["ponto1","ponto2"],"recomendacao":"Recomendado para observação"}\n\nATLETA:\n- Link: ${url}\n- Posição: ${pos||'Não informada'}\n- Descrição: ${desc}\n\nScores de 0-100. Seja técnico e objetivo.`;
+  const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Authorization':'Bearer '+OR_KEY,'Content-Type':'application/json','HTTP-Referer':'https://revela-eight.vercel.app','X-Title':'Revela Brasil'},body:JSON.stringify({model:'meta-llama/llama-3.1-8b-instruct:free',messages:[{role:'user',content:prompt}],max_tokens:800})});
+  const d=await res.json();
+  const txt=d.choices?.[0]?.message?.content||'';
+  const m=txt.match(/\{[\s\S]*\}/);
+  if(!m)throw new Error('IA não retornou análise válida');
+  return JSON.parse(m[0]);
+}
+ 
 async function enviarVideo(){
   const url=document.getElementById('vLink').value.trim();
   const desc=document.getElementById('vDesc').value.trim();
   if(!url)return showMsg('msgVideo','Cole o link do vídeo.','err');
-  if(!url.startsWith('http'))return showMsg('msgVideo','Link inválido. Use uma URL completa.','err');
-  if(!desc||desc.length<30)return showMsg('msgVideo','Descreva o vídeo com pelo menos 30 caracteres para a IA analisar melhor.','err');
-
+  if(!url.startsWith('http'))return showMsg('msgVideo','Link inválido.','err');
+  if(!desc||desc.length<30)return showMsg('msgVideo','Descreva o vídeo com pelo menos 30 caracteres.','err');
   const btn=document.getElementById('btnVideo');
   btn.disabled=true;btn.textContent='⏳ Analisando com IA...';
-
   try{
-    // Busca posição do atleta
-    const{data:perfil}=await sb.from('atletas').select('posicao,nome').eq('id',userId).single();
-
-    // Salva o vídeo primeiro
-    const{data:vid,error}=await sb.from('videos').insert({
-      atleta_id:userId,url,
-      descricao:desc,
-      criado_em:new Date().toISOString()
-    }).select().single();
+    const{data:perfil}=await sb.from('atletas').select('posicao').eq('id',userId).single();
+    const{data:vid,error}=await sb.from('videos').insert({atleta_id:userId,url,descricao:desc,criado_em:new Date().toISOString()}).select().single();
     if(error)throw error;
-
-    showMsg('msgVideo','✓ Vídeo salvo! Analisando com IA...','ok');
-
-    // Analisa com IA
-    const relatorio = await analisarComIA(url, desc, perfil?.posicao);
-
-    // Salva o relatório
-    await sb.from('videos').update({relatorio}).eq('id',vid.id);
-
-    showMsg('msgVideo','🤖 Análise concluída! Veja o relatório abaixo.','ok');
+    showMsg('msgVideo','✓ Vídeo salvo! Analisando...','ok');
+    const rel=await analisarComIA(url,desc,perfil?.posicao);
+    await sb.from('videos').update({relatorio:rel}).eq('id',vid.id);
+    showMsg('msgVideo','🤖 Análise concluída!','ok');
     document.getElementById('vLink').value='';
     document.getElementById('vDesc').value='';
     await carregarVideos();
-
-  }catch(e){
-    showMsg('msgVideo','Erro: '+e.message,'err');
-  }
-
+  }catch(e){showMsg('msgVideo','Erro: '+e.message,'err');}
   btn.disabled=false;btn.textContent='🤖 Enviar e analisar com IA';
 }
-
+ 
 async function sair(){await sb.auth.signOut();window.location.href='index.html';}
 init();
 </script>
