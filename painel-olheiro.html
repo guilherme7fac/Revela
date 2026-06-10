@@ -8,143 +8,309 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--v:#00E676;--ve:#00B050;--p:#070A0B;--p2:#0E1315;--p3:#161D20;--c:#8A9399;--b:#F0F4F2;--y:#FFD600;--r:#ff6b6b}
-body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-height:100vh}
+:root{--v:#00E676;--ve:#00B050;--p:#070A0B;--p2:#0E1315;--p3:#161D20;--c:#8A9399;--b:#F0F4F2;--r:#ff6b6b;--y:#FFD600;--sidebar:240px}
+body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex}
 .loading{position:fixed;inset:0;background:var(--p);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px}
 .loading-logo{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:8px}.loading-logo span{color:var(--v)}
 .loading-bar{width:200px;height:2px;background:rgba(255,255,255,.1);border-radius:1px;overflow:hidden}
-.loading-bar::after{content:'';display:block;height:100%;background:var(--v);animation:load 1.5s ease-in-out infinite}
-@keyframes load{0%{width:0%;transform:translateX(0)}50%{width:100%}100%{width:0%;transform:translateX(200px)}}
-nav{background:var(--p2);border-bottom:1px solid rgba(255,255,255,.06);padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;color:var(--b);text-decoration:none}.logo span{color:var(--v)}
-.nav-right{display:flex;align-items:center;gap:14px}
-.user-name{font-size:13px;color:var(--c)}
-.btn-sair{background:none;border:1px solid rgba(255,255,255,.1);color:var(--c);font-size:12px;padding:7px 14px;border-radius:2px;cursor:pointer;transition:border-color .2s,color .2s}.btn-sair:hover{border-color:rgba(255,60,60,.4);color:var(--r)}
-.main{max-width:1100px;margin:0 auto;padding:40px 24px}
+.loading-bar::after{content:'';display:block;height:100%;background:var(--v);animation:ld 1.5s ease-in-out infinite}
+@keyframes ld{0%{width:0%;transform:translateX(0)}50%{width:100%}100%{width:0%;transform:translateX(200px)}}
+.sidebar{width:var(--sidebar);min-height:100vh;background:var(--p2);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;transition:transform .3s}
+.sb-logo{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-logo a{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:6px;color:var(--b);text-decoration:none}.sb-logo a span{color:var(--v)}
+.sb-user{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-user-name{font-size:13px;font-weight:500;color:var(--b);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#64B5F6}
+.sb-nav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:4px}
+.sb-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:8px 8px 4px;margin-top:8px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:4px;color:var(--c);text-decoration:none;font-size:13px;font-weight:500;transition:background .2s,color .2s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.sb-item:hover{background:rgba(255,255,255,.05);color:var(--b)}
+.sb-item.active{background:rgba(100,181,246,.1);color:#64B5F6}
+.sb-item-icon{width:18px;height:18px;flex-shrink:0;opacity:.7}
+.sb-item.active .sb-item-icon{opacity:1}
+.sb-bottom{padding:16px 12px;border-top:1px solid rgba(255,255,255,.06)}
+.btn-sair{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:4px;color:var(--c);font-size:13px;font-weight:500;background:none;border:none;width:100%;cursor:pointer;transition:background .2s,color .2s}
+.btn-sair:hover{background:rgba(255,60,60,.08);color:var(--r)}
+.sb-toggle{display:none;position:fixed;top:16px;left:16px;z-index:60;background:var(--p2);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:8px;cursor:pointer;flex-direction:column;gap:4px}
+.sb-toggle span{width:18px;height:2px;background:var(--b);border-radius:1px;display:block;transition:.3s}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
+.main-wrap{margin-left:var(--sidebar);flex:1;min-height:100vh}
+.main{max-width:1000px;margin:0 auto;padding:40px 32px}
 .page-title{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:1px;color:var(--b);margin-bottom:4px}
-.page-sub{font-size:14px;color:var(--c);margin-bottom:32px}
-
-/* FILTROS */
-.filtros{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:20px 24px;margin-bottom:24px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:12px;align-items:end}
+.page-sub{font-size:14px;color:var(--c);margin-bottom:28px}
+.tab-sec{display:none}.tab-sec.show{display:block}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.card{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:20px}
+.card-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--c);margin-bottom:8px}
+.card-value{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;color:var(--b)}
+.card-value.v{color:var(--v)}.card-value.b{color:#64B5F6}
+.card-desc{font-size:11px;color:var(--c);margin-top:4px}
+.filtros{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:18px 20px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:10px;align-items:end}
 .fg label{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--c);margin-bottom:5px}
-.fg select,.fg input{width:100%;background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:2px;padding:10px 12px;color:var(--b);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.fg select,.fg input{width:100%;background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:2px;padding:9px 12px;color:var(--b);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;-webkit-appearance:none}
 .fg select:focus,.fg input:focus{border-color:var(--v)}
 .fg select option{background:var(--p3)}
-.btn-buscar{background:var(--v);color:var(--p);font-weight:500;font-size:13px;letter-spacing:.05em;text-transform:uppercase;padding:11px 22px;border:none;border-radius:2px;cursor:pointer;transition:background .2s;white-space:nowrap}
+.btn-buscar{background:var(--v);color:var(--p);font-weight:500;font-size:13px;letter-spacing:.05em;text-transform:uppercase;padding:10px 20px;border:none;border-radius:2px;cursor:pointer;transition:background .2s;white-space:nowrap}
 .btn-buscar:hover{background:var(--ve)}
-
-/* RESULTADOS */
-.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.results-header{display:flex;align-items:center;margin-bottom:14px}
 .results-count{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--c);text-transform:uppercase}
 .results-count span{color:var(--v)}
-
-/* CARDS ATLETAS */
-.atletas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.atletas-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
 .atleta-card{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;overflow:hidden;transition:border-color .3s,transform .3s}
 .atleta-card:hover{border-color:rgba(0,230,118,.2);transform:translateY(-3px)}
-
-.ac-top{padding:20px 20px 16px}
-.ac-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
-.ac-avatar{width:48px;height:48px;background:rgba(0,230,118,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--v);flex-shrink:0}
+.ac-top{padding:18px 18px 14px}
+.ac-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.ac-avatar{width:44px;height:44px;background:rgba(0,230,118,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--v);flex-shrink:0}
 .ac-score-big{text-align:right}
-.ac-score-num{font-family:'Bebas Neue',sans-serif;font-size:44px;line-height:1}
+.ac-score-num{font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1}
 .ac-score-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;color:var(--c);text-transform:uppercase}
-.score-alto{color:var(--v)}.score-medio{color:var(--y)}.score-baixo{color:var(--r)}
-
-.ac-nome{font-weight:500;font-size:15px;color:var(--b);margin-bottom:4px}
-.ac-loc{font-size:12px;color:var(--c);margin-bottom:12px}
-.ac-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.sa{color:var(--v)}.sm{color:var(--y)}.sb2{color:var(--r)}
+.ac-nome{font-weight:500;font-size:14px;color:var(--b);margin-bottom:3px}
+.ac-loc{font-size:12px;color:var(--c);margin-bottom:10px}
+.ac-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
 .ac-tag{font-size:11px;color:var(--c);background:var(--p3);padding:3px 8px;border-radius:2px}
 .ac-tag.pos{background:rgba(0,230,118,.1);color:var(--v);font-weight:500}
-
-/* MINI SCORES */
-.mini-scores{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
-.ms-item{background:var(--p3);border-radius:2px;padding:8px 6px;text-align:center}
-.ms-label{font-size:9px;color:var(--c);margin-bottom:3px;letter-spacing:.04em}
-.ms-val{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1}
-
-/* RESUMO IA */
-.ac-resumo{font-size:12px;color:var(--c);line-height:1.6;background:var(--p3);padding:10px 12px;border-radius:2px;border-left:2px solid var(--v);margin-bottom:14px}
-
-/* PONTOS */
-.ac-pontos{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
-.ac-ponto{font-size:11px;display:flex;gap:6px;align-items:flex-start}
-.ac-ponto.pos{color:rgba(0,230,118,.8)}
-.ac-ponto.neg{color:rgba(255,107,107,.75)}
-
-/* RECOMENDAÇÃO */
-.ac-rec{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--v);text-transform:uppercase;margin-bottom:14px}
-
-/* SEM IA */
-.sem-ia{background:rgba(255,255,255,.03);border-radius:2px;padding:14px;text-align:center;margin-bottom:14px}
-.sem-ia-icon{font-size:24px;margin-bottom:6px}
+.mini-scores{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:12px}
+.ms-item{background:var(--p3);border-radius:2px;padding:7px 5px;text-align:center}
+.ms-label{font-size:9px;color:var(--c);margin-bottom:2px}
+.ms-val{font-family:'Bebas Neue',sans-serif;font-size:18px;line-height:1}
+.ac-resumo{font-size:11px;color:var(--c);line-height:1.6;background:var(--p3);padding:9px 11px;border-radius:2px;border-left:2px solid var(--v);margin-bottom:10px}
+.ac-pontos{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.ac-ponto{font-size:11px;display:flex;gap:5px}.ac-ponto.pos{color:rgba(0,230,118,.8)}.ac-ponto.neg{color:rgba(255,107,107,.75)}
+.ac-rec{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:var(--v);text-transform:uppercase;margin-bottom:10px}
+.sem-ia{background:rgba(255,255,255,.03);border-radius:2px;padding:12px;text-align:center;margin-bottom:12px}
 .sem-ia-txt{font-size:12px;color:var(--c)}
-
-/* FOOTER CARD */
-.ac-footer{border-top:1px solid rgba(255,255,255,.06);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
-.btn-video{display:inline-flex;align-items:center;gap:6px;background:var(--v);color:var(--p);font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:8px 16px;border-radius:2px;text-decoration:none;transition:background .2s}
+.ac-footer{border-top:1px solid rgba(255,255,255,.06);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.btn-video{display:inline-flex;align-items:center;gap:5px;background:var(--v);color:var(--p);font-weight:500;font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:7px 14px;border-radius:2px;text-decoration:none;transition:background .2s}
 .btn-video:hover{background:var(--ve)}
-.btn-video-sem{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--c);font-size:12px;padding:8px 16px;border-radius:2px;border:1px solid rgba(255,255,255,.08)}
-.ac-data{font-size:11px;color:var(--c)}
-
+.btn-fav{background:none;border:1px solid rgba(255,255,255,.1);font-size:11px;padding:5px 10px;border-radius:2px;cursor:pointer;transition:.2s}
+.btn-fav.ativo{border-color:var(--y);color:var(--y)}
+.btn-fav:not(.ativo){color:var(--c)}
+.btn-fav:hover{border-color:var(--y);color:var(--y)}
 .empty-state{grid-column:1/-1;text-align:center;padding:60px 24px}
-.empty-state .emo{font-size:40px;margin-bottom:12px}
-.empty-state p{font-size:14px;color:var(--c)}
-
-@media(max-width:1000px){.atletas-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:768px){.filtros{grid-template-columns:1fr 1fr}.filtros .btn-buscar{grid-column:1/-1}.atletas-grid{grid-template-columns:1fr}nav{padding:14px 16px}.main{padding:24px 16px}}
-@media(max-width:480px){.filtros{grid-template-columns:1fr}.mini-scores{grid-template-columns:repeat(2,1fr)}}
+.empty-state .emo{font-size:36px;margin-bottom:10px}
+.empty-state p{font-size:13px;color:var(--c)}
+.sbox{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:26px;margin-bottom:18px}
+.sbox-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.5px;color:var(--b);margin-bottom:3px}
+.sbox-sub{font-size:12px;color:var(--c);margin-bottom:18px}
+.plano-atual{background:rgba(100,181,246,.05);border:1px solid rgba(100,181,246,.2);border-radius:4px;padding:22px;margin-bottom:14px}
+.plano-nome{font-family:'Bebas Neue',sans-serif;font-size:30px;color:#64B5F6;margin-bottom:4px}
+.plano-preco{font-size:22px;font-weight:500;color:var(--b);margin-bottom:8px}
+.plano-desc{font-size:13px;color:var(--c);line-height:1.6}
+.suporte-opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
+.suporte-card{background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:20px;text-align:center;text-decoration:none;transition:border-color .3s,transform .2s;display:flex;flex-direction:column;align-items:center;gap:9px}
+.suporte-card:hover{border-color:rgba(100,181,246,.3);transform:translateY(-2px)}
+.suporte-icon{font-size:30px}
+.suporte-title{font-weight:500;font-size:14px;color:var(--b)}
+.suporte-desc{font-size:12px;color:var(--c);line-height:1.5}
+@media(max-width:900px){.atletas-grid{grid-template-columns:1fr}.filtros{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .sb-toggle{display:flex}.sb-overlay.show{display:block}
+  .main-wrap{margin-left:0}.main{padding:24px 16px}
+  .cards{grid-template-columns:1fr 1fr}.filtros{grid-template-columns:1fr}
+  .filtros .btn-buscar{grid-column:1/-1}.suporte-opts{grid-template-columns:1fr}
+}
+@media(max-width:480px){.cards{grid-template-columns:1fr}.mini-scores{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
-<div class="loading" id="loading">
-  <div class="loading-logo">REVEL<span>A</span></div>
-  <div class="loading-bar"></div>
+<div class="loading" id="loading"><div class="loading-logo">REVEL<span>A</span></div><div class="loading-bar"></div></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo"><a href="index.html">REVEL<span>A</span></a></div>
+  <div class="sb-user"><div class="sb-user-name" id="sbNome">—</div><div class="sb-user-role">Olheiro / Clube</div></div>
+  <nav class="sb-nav">
+    <span class="sb-label">Menu</span>
+    <button class="sb-item active" onclick="irPara('buscar',this)">
+      <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar Atletas
+    </button>
+    <button class="sb-item" onclick="irPara('favoritos',this)">
+      <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Favoritos
+    </button>
+    <span class="sb-label">Plataforma</span>
+    <a class="sb-item" href="index.html">
+      <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Início
+    </a>
+    <button class="sb-item" onclick="irPara('plano',this)">
+      <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Meu Plano
+    </button>
+    <button class="sb-item" onclick="irPara('suporte',this)">
+      <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Suporte
+    </button>
+  </nav>
+  <div class="sb-bottom">
+    <button class="btn-sair" onclick="sair()">
+      <svg style="width:16px;height:16px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair
+    </button>
+  </div>
+</aside>
+<div class="sb-overlay" id="sbOverlay" onclick="closeSb()"></div>
+<button class="sb-toggle" id="sbToggle" onclick="toggleSb()"><span></span><span></span><span></span></button>
+<div class="main-wrap">
+  <div class="main">
+
+    <!-- BUSCAR -->
+    <div class="tab-sec show" id="sec-buscar">
+      <div class="page-title">Banco de Talentos</div>
+      <p class="page-sub">Encontre jovens atletas com análise completa de IA.</p>
+      <div class="cards">
+        <div class="card"><div class="card-label">Atletas</div><div class="card-value v" id="mAtletas">—</div><div class="card-desc">no banco de dados</div></div>
+        <div class="card"><div class="card-label">Analisados IA</div><div class="card-value b" id="mIA">—</div><div class="card-desc">com relatório</div></div>
+        <div class="card"><div class="card-label">Favoritos</div><div class="card-value v" id="mFavs">0</div><div class="card-desc">salvos por você</div></div>
+      </div>
+      <div class="filtros">
+        <div class="fg"><label>Estado</label><select id="fEst"><option value="">Todos</option><option>AC</option><option>AL</option><option>AM</option><option>AP</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MG</option><option>MS</option><option>MT</option><option>PA</option><option>PB</option><option>PE</option><option>PI</option><option>PR</option><option>RJ</option><option>RN</option><option>RO</option><option>RR</option><option>RS</option><option>SC</option><option>SE</option><option>SP</option><option>TO</option></select></div>
+        <div class="fg"><label>Posição</label><select id="fPos"><option value="">Todas</option><option>Goleiro</option><option>Lateral Direito</option><option>Lateral Esquerdo</option><option>Zagueiro</option><option>Volante</option><option>Meia</option><option>Atacante</option><option>Ponta Direita</option><option>Ponta Esquerda</option></select></div>
+        <div class="fg"><label>Cidade</label><input type="text" id="fCid" placeholder="Qualquer cidade"></div>
+        <div class="fg"><label>Score mínimo</label><select id="fScore"><option value="0">Qualquer</option><option value="50">50+ Médio</option><option value="70">70+ Bom</option><option value="80">80+ Ótimo</option><option value="90">90+ Excepcional</option></select></div>
+        <button class="btn-buscar" onclick="buscar()">Buscar</button>
+      </div>
+      <div class="results-header"><div class="results-count">Mostrando <span id="count">0</span> atletas</div></div>
+      <div class="atletas-grid" id="grid"><div class="empty-state"><div class="emo">🔍</div><p>Clique em "Buscar" para ver os talentos.</p></div></div>
+    </div>
+
+    <!-- FAVORITOS -->
+    <div class="tab-sec" id="sec-favoritos">
+      <div class="page-title">Favoritos</div>
+      <p class="page-sub">Atletas que você salvou para acompanhar de perto.</p>
+      <div class="atletas-grid" id="gridFavs"><div class="empty-state"><div class="emo">⭐</div><p>Você ainda não favoritou nenhum atleta.</p></div></div>
+    </div>
+
+    <!-- PLANO -->
+    <div class="tab-sec" id="sec-plano">
+      <div class="page-title">Meu Plano</div>
+      <p class="page-sub">Gerencie sua assinatura e acesso ao banco de talentos.</p>
+      <div class="sbox">
+        <div class="sbox-title">Plano atual</div>
+        <div class="plano-atual">
+          <div class="plano-nome">Olheiro Pro</div>
+          <div class="plano-preco">R$ 300,00<span style="font-size:14px;font-weight:300;color:var(--c)">/mês</span></div>
+          <div class="plano-desc">✓ Acesso completo ao banco de talentos<br>✓ Relatórios de IA de todos os atletas<br>✓ Filtros avançados por região e posição<br>✓ Alertas de novos talentos na sua região<br>✓ Lista de favoritos ilimitada</div>
+        </div>
+        <p style="font-size:13px;color:var(--c)">Integração com pagamento em breve. Dúvidas? Fale conosco pelo suporte.</p>
+      </div>
+    </div>
+
+    <!-- SUPORTE -->
+    <div class="tab-sec" id="sec-suporte">
+      <div class="page-title">Suporte</div>
+      <p class="page-sub">Fale conosco — estamos aqui para ajudar.</p>
+      <div class="sbox">
+        <div class="sbox-title">Canais de atendimento</div>
+        <p class="sbox-sub">Escolha como prefere falar com a nossa equipe:</p>
+        <div class="suporte-opts">
+          <a href="https://wa.me/5500000000000?text=Olá! Sou olheiro no Revela e preciso de ajuda." target="_blank" class="suporte-card">
+            <div class="suporte-icon">💬</div><div class="suporte-title">WhatsApp</div><div class="suporte-desc">Atendimento rápido. Resposta em até 24h.</div>
+          </a>
+          <a href="mailto:contato@revelabrasil.com.br" class="suporte-card">
+            <div class="suporte-icon">✉️</div><div class="suporte-title">E-mail</div><div class="suporte-desc">Envie sua dúvida. Resposta em até 48h.</div>
+          </a>
+        </div>
+      </div>
+      <div class="sbox">
+        <div class="sbox-title">Dúvidas frequentes</div>
+        <p class="sbox-sub">Perguntas mais comuns dos olheiros:</p>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+          <div style="background:var(--p3);border-radius:4px;padding:14px"><div style="font-weight:500;font-size:13px;margin-bottom:5px">Como funciona o Score de IA?</div><div style="font-size:12px;color:var(--c);line-height:1.6">Nossa IA analisa o vídeo e gera scores de técnica, físico, tático e potencial. Quanto maior o score, maior o potencial do atleta.</div></div>
+          <div style="background:var(--p3);border-radius:4px;padding:14px"><div style="font-weight:500;font-size:13px;margin-bottom:5px">Como favoritar um atleta?</div><div style="font-size:12px;color:var(--c);line-height:1.6">Na busca, clique em "☆ Favoritar" no card do atleta. Ele aparecerá na sua lista de favoritos.</div></div>
+          <div style="background:var(--p3);border-radius:4px;padding:14px"><div style="font-weight:500;font-size:13px;margin-bottom:5px">Posso entrar em contato com o atleta?</div><div style="font-size:12px;color:var(--c);line-height:1.6">Sim! Entre em contato pelo WhatsApp ou e-mail e nossa equipe facilita a intermediação.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
-<nav>
-  <a href="index.html" class="logo">REVEL<span>A</span></a>
-  <div class="nav-right">
-    <span class="user-name" id="userEmail">—</span>
-    <button class="btn-sair" onclick="sair()">Sair</button>
-  </div>
-</nav>
-<main class="main">
-  <div class="page-title">Banco de Talentos</div>
-  <p class="page-sub">Encontre jovens atletas de todo o Brasil com análise completa de IA.</p>
-
-  <div class="filtros">
-    <div class="fg"><label>Estado</label><select id="fEst"><option value="">Todos os estados</option><option>AC</option><option>AL</option><option>AM</option><option>AP</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MG</option><option>MS</option><option>MT</option><option>PA</option><option>PB</option><option>PE</option><option>PI</option><option>PR</option><option>RJ</option><option>RN</option><option>RO</option><option>RR</option><option>RS</option><option>SC</option><option>SE</option><option>SP</option><option>TO</option></select></div>
-    <div class="fg"><label>Posição</label><select id="fPos"><option value="">Todas as posições</option><option>Goleiro</option><option>Lateral Direito</option><option>Lateral Esquerdo</option><option>Zagueiro</option><option>Volante</option><option>Meia</option><option>Atacante</option><option>Ponta Direita</option><option>Ponta Esquerda</option></select></div>
-    <div class="fg"><label>Cidade</label><input type="text" id="fCid" placeholder="Qualquer cidade"></div>
-    <div class="fg"><label>Score mínimo IA</label><select id="fScore"><option value="0">Qualquer score</option><option value="50">50+ (Médio)</option><option value="70">70+ (Bom)</option><option value="80">80+ (Ótimo)</option><option value="90">90+ (Excepcional)</option></select></div>
-    <button class="btn-buscar" onclick="buscar()">Buscar</button>
-  </div>
-
-  <div class="results-header">
-    <div class="results-count">Mostrando <span id="count">0</span> atletas</div>
-  </div>
-
-  <div class="atletas-grid" id="grid">
-    <div class="empty-state"><div class="emo">🔍</div><p>Clique em "Buscar" para ver os talentos.</p></div>
-  </div>
-</main>
 
 <script>
 const SURL='https://yrthxqmzuwurgthdfozx.supabase.co';
 const SKEY='sb_publishable_sPcnhj8prRj6UagRwFqrUA_73ZeFxC5';
 const {createClient}=supabase;
 const sb=createClient(SURL,SKEY);
+let favs=JSON.parse(localStorage.getItem('revela_favs')||'[]');
 
+function toggleSb(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sbOverlay').classList.toggle('show')}
+function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('show')}
+function irPara(sec,btn){
+  document.querySelectorAll('.tab-sec').forEach(s=>s.classList.remove('show'));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+sec).classList.add('show');
+  if(btn)btn.classList.add('active');
+  closeSb();window.scrollTo(0,0);
+  if(sec==='favoritos')renderFavs();
+}
 function ini(n){return n?n.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase():'??'}
-function sc(s){return s>=75?'score-alto':s>=50?'score-medio':'score-baixo'}
-function idade(d){if(!d)return null;const a=new Date(d);const hoje=new Date();return hoje.getFullYear()-a.getFullYear();}
+function sc(s){return s>=75?'sa':s>=50?'sm':'sb2'}
+function idade(d){if(!d)return null;return new Date().getFullYear()-new Date(d).getFullYear();}
+
+function toggleFav(id){
+  if(favs.includes(id))favs=favs.filter(f=>f!==id);
+  else favs.push(id);
+  localStorage.setItem('revela_favs',JSON.stringify(favs));
+  document.getElementById('mFavs').textContent=favs.length;
+  document.querySelectorAll('.btn-fav[data-id="'+id+'"]').forEach(btn=>{
+    btn.classList.toggle('ativo',favs.includes(id));
+    btn.textContent=favs.includes(id)?'★ Favoritado':'☆ Favoritar';
+  });
+}
+
+function cardHTML(a){
+  const videos=a.videos||[];
+  const melhor=videos.find(v=>v.relatorio)||videos[0];
+  const rel=melhor?.relatorio;
+  const id=idade(a.data_nascimento);
+  const isFav=favs.includes(a.id);
+  return `<div class="atleta-card">
+    <div class="ac-top">
+      <div class="ac-header">
+        <div class="ac-avatar">${ini(a.nome)}</div>
+        ${rel?`<div class="ac-score-big"><div class="ac-score-num ${sc(rel.score_geral)}">${rel.score_geral}</div><div class="ac-score-label">Score IA</div></div>`:''}
+      </div>
+      <div class="ac-nome">${a.nome||'Atleta'}</div>
+      <div class="ac-loc">📍 ${a.cidade||'—'}, ${a.estado||'—'}</div>
+      <div class="ac-tags">
+        ${a.posicao?`<span class="ac-tag pos">${a.posicao}</span>`:''}
+        ${id?`<span class="ac-tag">${id} anos</span>`:''}
+        ${a.altura?`<span class="ac-tag">${a.altura}cm</span>`:''}
+        ${videos.length?`<span class="ac-tag">🎬 ${videos.length} vídeo${videos.length>1?'s':''}</span>`:''}
+      </div>
+      ${rel?`
+      <div class="mini-scores">
+        <div class="ms-item"><div class="ms-label">Técnica</div><div class="ms-val ${sc(rel.score_tecnica)}">${rel.score_tecnica}</div></div>
+        <div class="ms-item"><div class="ms-label">Físico</div><div class="ms-val ${sc(rel.score_fisico)}">${rel.score_fisico}</div></div>
+        <div class="ms-item"><div class="ms-label">Tático</div><div class="ms-val ${sc(rel.score_tatico)}">${rel.score_tatico}</div></div>
+        <div class="ms-item"><div class="ms-label">Potencial</div><div class="ms-val ${sc(rel.score_potencial)}">${rel.score_potencial}</div></div>
+      </div>
+      <div class="ac-resumo">${rel.resumo||''}</div>
+      <div class="ac-pontos">
+        ${(rel.pontos_positivos||[]).slice(0,2).map(p=>`<div class="ac-ponto pos">✓ ${p}</div>`).join('')}
+        ${(rel.pontos_atencao||[]).slice(0,1).map(p=>`<div class="ac-ponto neg">⚠ ${p}</div>`).join('')}
+      </div>
+      ${rel.recomendacao?`<div class="ac-rec">🏆 ${rel.recomendacao}</div>`:''}
+      `:`<div class="sem-ia"><div class="sem-ia-txt">⏳ Análise de IA pendente</div></div>`}
+    </div>
+    <div class="ac-footer">
+      ${melhor?.url?`<a href="${melhor.url}" target="_blank" class="btn-video">🎬 Ver vídeo</a>`:`<span style="font-size:11px;color:var(--c)">Sem vídeo</span>`}
+      <button class="btn-fav ${isFav?'ativo':''}" data-id="${a.id}" onclick="toggleFav('${a.id}')">${isFav?'★ Favoritado':'☆ Favoritar'}</button>
+    </div>
+  </div>`;
+}
 
 async function init(){
   const{data:{session}}=await sb.auth.getSession();
   if(!session){window.location.href='index.html';return;}
-  document.getElementById('userEmail').textContent=session.user.email;
+  const nome=session.user.user_metadata?.nome||session.user.email.split('@')[0];
+  document.getElementById('sbNome').textContent=nome;
+  document.getElementById('mFavs').textContent=favs.length;
+  await carregarMetricas();
   document.getElementById('loading').style.display='none';
   await buscar();
+}
+
+async function carregarMetricas(){
+  const{count:total}=await sb.from('atletas').select('*',{count:'exact',head:true});
+  document.getElementById('mAtletas').textContent=total||0;
+  const{count:comIA}=await sb.from('videos').select('*',{count:'exact',head:true}).not('relatorio','is',null);
+  document.getElementById('mIA').textContent=comIA||0;
 }
 
 async function buscar(){
@@ -152,90 +318,27 @@ async function buscar(){
   const pos=document.getElementById('fPos').value;
   const cid=document.getElementById('fCid').value.trim();
   const scoreMin=parseInt(document.getElementById('fScore').value)||0;
-
-  let query=sb.from('atletas').select('*, videos(url,descricao,relatorio,criado_em)').order('criado_em',{ascending:false}).limit(60);
+  let query=sb.from('atletas').select('*, videos(url,descricao,relatorio)').order('criado_em',{ascending:false}).limit(60);
   if(est)query=query.eq('estado',est);
   if(pos)query=query.eq('posicao',pos);
   if(cid)query=query.ilike('cidade','%'+cid+'%');
-
-  const{data,error}=await query;
-  const grid=document.getElementById('grid');
-
+  const{data}=await query;
   let lista=data||[];
-
-  // Filtra por score mínimo se necessário
-  if(scoreMin>0){
-    lista=lista.filter(a=>{
-      const melhorScore=Math.max(...(a.videos||[]).map(v=>v.relatorio?.score_geral||0),0);
-      return melhorScore>=scoreMin;
-    });
-  }
-
+  if(scoreMin>0)lista=lista.filter(a=>Math.max(...(a.videos||[]).map(v=>v.relatorio?.score_geral||0),0)>=scoreMin);
   document.getElementById('count').textContent=lista.length;
+  const grid=document.getElementById('grid');
+  if(!lista.length){grid.innerHTML='<div class="empty-state"><div class="emo">🏟️</div><p>Nenhum atleta encontrado.</p></div>';return;}
+  grid.innerHTML=lista.map(a=>cardHTML(a)).join('');
+}
 
-  if(!lista.length){
-    grid.innerHTML='<div class="empty-state"><div class="emo">🏟️</div><p>Nenhum atleta encontrado com esses filtros.</p></div>';
-    return;
-  }
-
-  grid.innerHTML=lista.map(a=>{
-    const videos=a.videos||[];
-    const melhorVideo=videos.find(v=>v.relatorio)||videos[0];
-    const rel=melhorVideo?.relatorio;
-    const id=idade(a.data_nascimento);
-
-    return `<div class="atleta-card">
-      <div class="ac-top">
-        <div class="ac-header">
-          <div class="ac-avatar">${ini(a.nome)}</div>
-          ${rel?`<div class="ac-score-big">
-            <div class="ac-score-num ${sc(rel.score_geral)}">${rel.score_geral}</div>
-            <div class="ac-score-label">Score IA</div>
-          </div>`:''}
-        </div>
-
-        <div class="ac-nome">${a.nome||'Atleta'}</div>
-        <div class="ac-loc">📍 ${a.cidade||'—'}, ${a.estado||'—'}</div>
-
-        <div class="ac-tags">
-          ${a.posicao?`<span class="ac-tag pos">${a.posicao}</span>`:''}
-          ${id?`<span class="ac-tag">${id} anos</span>`:''}
-          ${a.altura?`<span class="ac-tag">${a.altura}cm</span>`:''}
-          ${videos.length?`<span class="ac-tag">🎬 ${videos.length} vídeo${videos.length>1?'s':''}</span>`:''}
-        </div>
-
-        ${rel?`
-        <div class="mini-scores">
-          <div class="ms-item"><div class="ms-label">Técnica</div><div class="ms-val ${sc(rel.score_tecnica)}">${rel.score_tecnica}</div></div>
-          <div class="ms-item"><div class="ms-label">Físico</div><div class="ms-val ${sc(rel.score_fisico)}">${rel.score_fisico}</div></div>
-          <div class="ms-item"><div class="ms-label">Tático</div><div class="ms-val ${sc(rel.score_tatico)}">${rel.score_tatico}</div></div>
-          <div class="ms-item"><div class="ms-label">Potencial</div><div class="ms-val ${sc(rel.score_potencial)}">${rel.score_potencial}</div></div>
-        </div>
-
-        <div class="ac-resumo">${rel.resumo||''}</div>
-
-        <div class="ac-pontos">
-          ${(rel.pontos_positivos||[]).slice(0,2).map(p=>`<div class="ac-ponto pos">✓ ${p}</div>`).join('')}
-          ${(rel.pontos_atencao||[]).slice(0,1).map(p=>`<div class="ac-ponto neg">⚠ ${p}</div>`).join('')}
-        </div>
-
-        ${rel.recomendacao?`<div class="ac-rec">🏆 ${rel.recomendacao}</div>`:''}
-        `:`
-        <div class="sem-ia">
-          <div class="sem-ia-icon">⏳</div>
-          <div class="sem-ia-txt">Análise de IA ainda não disponível para este atleta.</div>
-        </div>
-        `}
-      </div>
-
-      <div class="ac-footer">
-        ${melhorVideo?.url
-          ?`<a href="${melhorVideo.url}" target="_blank" class="btn-video">🎬 Ver vídeo</a>`
-          :`<span class="btn-video-sem">Sem vídeo</span>`}
-        <span class="ac-data">${a.criado_em?new Date(a.criado_em).toLocaleDateString('pt-BR'):''}</span>
-      </div>
-    </div>`;
-  }).join('');
+async function renderFavs(){
+  const grid=document.getElementById('gridFavs');
+  if(!favs.length){grid.innerHTML='<div class="empty-state"><div class="emo">⭐</div><p>Você ainda não favoritou nenhum atleta.</p></div>';return;}
+  grid.innerHTML='<div class="empty-state"><div class="emo">⏳</div><p>Carregando...</p></div>';
+  const results=await Promise.all(favs.map(id=>sb.from('atletas').select('*, videos(url,descricao,relatorio)').eq('id',id).single().then(r=>r.data)));
+  const lista=results.filter(Boolean);
+  if(!lista.length){grid.innerHTML='<div class="empty-state"><div class="emo">⭐</div><p>Atletas não encontrados.</p></div>';return;}
+  grid.innerHTML=lista.map(a=>cardHTML(a)).join('');
 }
 
 async function sair(){await sb.auth.signOut();window.location.href='index.html';}
