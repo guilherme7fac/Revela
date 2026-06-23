@@ -10,14 +10,14 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{--v:#00E676;--ve:#00B050;--p:#070A0B;--p2:#0E1315;--p3:#161D20;--c:#8A9399;--b:#F0F4F2;--r:#ff6b6b;--y:#FFD600;--sidebar:240px}
 body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex}
- 
+
 /* LOADING */
 .loading{position:fixed;inset:0;background:var(--p);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px}
 .loading-logo{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:8px}.loading-logo span{color:var(--v)}
 .loading-bar{width:200px;height:2px;background:rgba(255,255,255,.1);border-radius:1px;overflow:hidden}
 .loading-bar::after{content:'';display:block;height:100%;background:var(--v);animation:ld 1.5s ease-in-out infinite}
 @keyframes ld{0%{width:0%;transform:translateX(0)}50%{width:100%}100%{width:0%;transform:translateX(200px)}}
- 
+
 /* SIDEBAR */
 .sidebar{width:var(--sidebar);min-height:100vh;background:var(--p2);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;transition:transform .3s}
 .sb-logo{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.06)}
@@ -35,18 +35,18 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
 .sb-bottom{padding:16px 12px;border-top:1px solid rgba(255,255,255,.06)}
 .btn-sair{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:4px;color:var(--c);font-size:13px;font-weight:500;background:none;border:none;width:100%;cursor:pointer;transition:background .2s,color .2s}
 .btn-sair:hover{background:rgba(255,60,60,.08);color:var(--r)}
- 
+
 /* TOGGLE MOBILE */
 .sb-toggle{display:none;position:fixed;top:16px;left:16px;z-index:60;background:var(--p2);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:8px;cursor:pointer;flex-direction:column;gap:4px}
 .sb-toggle span{width:18px;height:2px;background:var(--b);border-radius:1px;display:block;transition:.3s}
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
- 
+
 /* MAIN CONTENT */
 .main-wrap{margin-left:var(--sidebar);flex:1;min-height:100vh}
 .main{max-width:860px;margin:0 auto;padding:40px 32px}
 .page-title{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:1px;color:var(--b);margin-bottom:4px}
 .page-sub{font-size:14px;color:var(--c);margin-bottom:32px}
- 
+
 /* CARDS */
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
 .card{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:20px}
@@ -54,7 +54,7 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
 .card-value{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;color:var(--b)}
 .card-value.v{color:var(--v)}.card-value.y{color:var(--y)}
 .card-desc{font-size:11px;color:var(--c);margin-top:4px}
- 
+
 /* SECTION BOX */
 .sbox{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:26px;margin-bottom:18px}
 .sbox-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.5px;color:var(--b);margin-bottom:3px}
@@ -77,7 +77,7 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
 .msg{padding:10px 14px;border-radius:2px;font-size:12px;margin-top:10px;display:none}
 .msg.err{background:rgba(255,60,60,.09);border:1px solid rgba(255,60,60,.28);color:var(--r);display:block}
 .msg.ok{background:rgba(0,230,118,.09);border:1px solid rgba(0,230,118,.28);color:var(--v);display:block}
- 
+
 /* VÍDEOS */
 .vlist{display:flex;flex-direction:column;gap:12px;margin-top:14px}
 .vitem{background:var(--p3);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:16px}
@@ -87,7 +87,7 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
 .vi-badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px;flex-shrink:0}
 .badge-ok{background:rgba(0,230,118,.1);color:var(--v);border:1px solid rgba(0,230,118,.2)}
 .badge-pend{background:rgba(255,214,0,.1);color:var(--y);border:1px solid rgba(255,214,0,.2)}
- 
+
 /* AI REPORT */
 .ai-rep{margin-top:12px;border-top:1px solid rgba(255,255,255,.06);padding-top:12px}
 .ai-rep-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--v);margin-bottom:10px}
@@ -100,7 +100,7 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
 .ai-pts{display:flex;flex-direction:column;gap:5px}
 .ai-pt{font-size:12px;display:flex;gap:7px}.ai-pt.pos{color:rgba(0,230,118,.85)}.ai-pt.neg{color:rgba(255,107,107,.8)}
 .empty{text-align:center;padding:28px;color:var(--c);font-size:13px}
- 
+
 /* SUPORTE */
 .suporte-opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
 .suporte-card{background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:22px;text-align:center;cursor:pointer;text-decoration:none;transition:border-color .3s,transform .2s;display:flex;flex-direction:column;align-items:center;gap:10px}
@@ -108,16 +108,16 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
 .suporte-icon{font-size:32px}
 .suporte-title{font-weight:500;font-size:14px;color:var(--b)}
 .suporte-desc{font-size:12px;color:var(--c);line-height:1.5}
- 
+
 /* PLANO */
 .plano-atual{background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.2);border-radius:4px;padding:24px;margin-bottom:16px}
 .plano-nome{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--v);margin-bottom:4px}
 .plano-preco{font-size:22px;font-weight:500;color:var(--b);margin-bottom:8px}
 .plano-desc{font-size:13px;color:var(--c);line-height:1.6}
- 
+
 /* TABS CONTEUDO */
 .tab-sec{display:none}.tab-sec.show{display:block}
- 
+
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
   .sb-toggle{display:flex}.sb-overlay.show{display:block}
@@ -130,7 +130,7 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
 </head>
 <body>
 <div class="loading" id="loading"><div class="loading-logo">REVEL<span>A</span></div><div class="loading-bar"></div></div>
- 
+
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sb-logo"><a href="index.html">REVEL<span>A</span></a></div>
@@ -169,19 +169,19 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
     </button>
   </div>
 </aside>
- 
+
 <!-- OVERLAY MOBILE -->
 <div class="sb-overlay" id="sbOverlay" onclick="closeSb()"></div>
- 
+
 <!-- TOGGLE MOBILE -->
 <button class="sb-toggle" id="sbToggle" onclick="toggleSb()">
   <span></span><span></span><span></span>
 </button>
- 
+
 <!-- CONTEÚDO PRINCIPAL -->
 <div class="main-wrap">
   <div class="main">
- 
+
     <!-- PERFIL -->
     <div class="tab-sec show" id="sec-perfil">
       <div class="page-title">Meu Perfil</div>
@@ -206,7 +206,7 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
         <button class="btn-save" id="btnPerfil" onclick="salvarPerfil()">Salvar perfil</button>
       </div>
     </div>
- 
+
     <!-- VÍDEOS -->
     <div class="tab-sec" id="sec-videos">
       <div class="page-title">Meus Vídeos</div>
@@ -229,7 +229,7 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
         <div class="vlist" id="videosList"><div class="empty">Nenhum vídeo enviado ainda.</div></div>
       </div>
     </div>
- 
+
     <!-- PLANO -->
     <div class="tab-sec" id="sec-plano">
       <div class="page-title">Meu Plano</div>
@@ -241,10 +241,12 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
           <div class="plano-preco">R$ 19,90<span style="font-size:14px;font-weight:300;color:var(--c)">/mês</span></div>
           <div class="plano-desc">✓ Perfil visível para todos os olheiros<br>✓ Envio ilimitado de vídeos<br>✓ Análise de IA em cada vídeo<br>✓ Notificação quando clube visualizar</div>
         </div>
-        <p style="font-size:13px;color:var(--c)">Integração com pagamento em breve. Em caso de dúvidas, entre em contato pelo suporte.</p>
+        <div id="statusPlano" style="margin-bottom:14px"></div>
+        <div id="msgPlano" class="msg"></div>
+        <button class="btn-save" id="btnAssinar" onclick="assinarPlano()">💳 Assinar agora — R$ 19,90/mês</button>
       </div>
     </div>
- 
+
     <!-- SUPORTE -->
     <div class="tab-sec" id="sec-suporte">
       <div class="page-title">Suporte</div>
@@ -284,10 +286,10 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
         </div>
       </div>
     </div>
- 
+
   </div>
 </div>
- 
+
 <script>
 const SURL='https://yrthxqmzuwurgthdfozx.supabase.co';
 const SKEY='sb_publishable_sPcnhj8prRj6UagRwFqrUA_73ZeFxC5';
@@ -295,11 +297,11 @@ const OR_KEY='sk-or-v1-1eb129fd0e73b968f6a243ab92df2fe833cd37c8eb935d5dfa16c7f56
 const {createClient}=supabase;
 const sb=createClient(SURL,SKEY);
 let userId=null;
- 
+
 // SIDEBAR
 function toggleSb(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sbOverlay').classList.toggle('show')}
 function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('show')}
- 
+
 function irPara(sec,btn){
   document.querySelectorAll('.tab-sec').forEach(s=>s.classList.remove('show'));
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
@@ -308,10 +310,10 @@ function irPara(sec,btn){
   closeSb();
   window.scrollTo(0,0);
 }
- 
+
 function showMsg(id,m,t){const e=document.getElementById(id);e.textContent=m;e.className='msg '+t;setTimeout(()=>{e.className='msg'},5000)}
 function scCls(s){return s>=75?'sv-a':s>=50?'sv-m':'sv-b'}
- 
+
 async function init(){
   const{data:{session}}=await sb.auth.getSession();
   if(!session){window.location.href='index.html';return;}
@@ -320,9 +322,10 @@ async function init(){
   document.getElementById('sbNome').textContent=nome;
   await carregarPerfil();
   await carregarVideos();
+  await checarPlano();
   document.getElementById('loading').style.display='none';
 }
- 
+
 async function carregarPerfil(){
   const{data}=await sb.from('atletas').select('*').eq('id',userId).single();
   if(data){
@@ -335,7 +338,7 @@ async function carregarPerfil(){
     if(data.nome)document.getElementById('sbNome').textContent=data.nome;
   }
 }
- 
+
 async function salvarPerfil(){
   const btn=document.getElementById('btnPerfil');
   btn.disabled=true;btn.textContent='Salvando...';
@@ -353,7 +356,7 @@ async function salvarPerfil(){
   else{showMsg('msgPerfil','✓ Perfil salvo!','ok');await carregarPerfil();}
   btn.disabled=false;btn.textContent='Salvar perfil';
 }
- 
+
 async function carregarVideos(){
   const{data}=await sb.from('videos').select('*').eq('atleta_id',userId).order('criado_em',{ascending:false});
   document.getElementById('statVids').textContent=data?.length||0;
@@ -392,7 +395,7 @@ async function carregarVideos(){
       </div>`:''}
     </div>`).join('');
 }
- 
+
 async function analisarComIA(url,desc,pos){
   const prompt=`Você é um analista de scouting de futebol. Analise este atleta e responda APENAS com JSON válido:\n{"score_geral":75,"score_tecnica":72,"score_fisico":78,"score_tatico":71,"score_potencial":80,"resumo":"Resumo de 2-3 frases.","pontos_positivos":["ponto1","ponto2","ponto3"],"pontos_atencao":["ponto1","ponto2"],"recomendacao":"Recomendado para observação"}\n\nATLETA:\n- Link: ${url}\n- Posição: ${pos||'Não informada'}\n- Descrição: ${desc}\n\nScores de 0-100. Seja técnico e objetivo.`;
   const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Authorization':'Bearer '+OR_KEY,'Content-Type':'application/json','HTTP-Referer':'https://revela-eight.vercel.app','X-Title':'Revela Brasil'},body:JSON.stringify({model:'meta-llama/llama-3.1-8b-instruct:free',messages:[{role:'user',content:prompt}],max_tokens:800})});
@@ -402,7 +405,7 @@ async function analisarComIA(url,desc,pos){
   if(!m)throw new Error('IA não retornou análise válida');
   return JSON.parse(m[0]);
 }
- 
+
 async function enviarVideo(){
   const url=document.getElementById('vLink').value.trim();
   const desc=document.getElementById('vDesc').value.trim();
@@ -425,7 +428,42 @@ async function enviarVideo(){
   }catch(e){showMsg('msgVideo','Erro: '+e.message,'err');}
   btn.disabled=false;btn.textContent='🤖 Enviar e analisar com IA';
 }
- 
+
+async function checarPlano(){
+  const{data}=await sb.from('atletas').select('plano_ativo').eq('id',userId).single();
+  const el=document.getElementById('statusPlano');
+  const btn=document.getElementById('btnAssinar');
+  if(data?.plano_ativo){
+    el.innerHTML='<div style="background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);border-radius:2px;padding:10px 14px;font-size:12px;color:var(--v)">✓ Plano ativo — você já está visível para os olheiros!</div>';
+    btn.style.display='none';
+  } else {
+    el.innerHTML='<div style="background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.25);border-radius:2px;padding:10px 14px;font-size:12px;color:var(--y)">⚠ Plano inativo — assine para ficar visível aos olheiros.</div>';
+    btn.style.display='block';
+  }
+}
+
+async function assinarPlano(){
+  const btn=document.getElementById('btnAssinar');
+  btn.disabled=true;btn.textContent='Gerando pagamento...';
+  try{
+    const{data:{session}}=await sb.auth.getSession();
+    const res=await fetch('/api/criar-pagamento',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({tipo:'atleta',userId:session.user.id,email:session.user.email})
+    });
+    const data=await res.json();
+    if(data.init_point){
+      window.location.href=data.init_point;
+    } else {
+      showMsg('msgPlano','Erro ao gerar pagamento. Tente novamente.','err');
+    }
+  }catch(e){
+    showMsg('msgPlano','Erro: '+e.message,'err');
+  }
+  btn.disabled=false;btn.textContent='💳 Assinar agora — R$ 19,90/mês';
+}
+
 async function sair(){await sb.auth.signOut();window.location.href='index.html';}
 init();
 </script>
