@@ -97,6 +97,9 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
 .plano-nome{font-family:'Bebas Neue',sans-serif;font-size:30px;color:#64B5F6;margin-bottom:4px}
 .plano-preco{font-size:22px;font-weight:500;color:var(--b);margin-bottom:8px}
 .plano-desc{font-size:13px;color:var(--c);line-height:1.6}
+.msg{padding:10px 14px;border-radius:2px;font-size:12px;margin-top:10px;display:none}
+.msg.err{background:rgba(255,60,60,.09);border:1px solid rgba(255,60,60,.28);color:var(--r);display:block}
+.msg.ok{background:rgba(0,230,118,.09);border:1px solid rgba(0,230,118,.28);color:var(--v);display:block}
 .suporte-opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
 .suporte-card{background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:20px;text-align:center;text-decoration:none;transition:border-color .3s,transform .2s;display:flex;flex-direction:column;align-items:center;gap:9px}
 .suporte-card:hover{border-color:rgba(100,181,246,.3);transform:translateY(-2px)}
@@ -187,7 +190,9 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
           <div class="plano-preco">R$ 300,00<span style="font-size:14px;font-weight:300;color:var(--c)">/mês</span></div>
           <div class="plano-desc">✓ Acesso completo ao banco de talentos<br>✓ Relatórios de IA de todos os atletas<br>✓ Filtros avançados por região e posição<br>✓ Alertas de novos talentos na sua região<br>✓ Lista de favoritos ilimitada</div>
         </div>
-        <p style="font-size:13px;color:var(--c)">Integração com pagamento em breve. Dúvidas? Fale conosco pelo suporte.</p>
+        <div id="statusPlano" style="margin-bottom:14px"></div>
+        <div id="msgPlano" class="msg"></div>
+        <button class="btn-buscar" id="btnAssinar" onclick="assinarPlano()" style="width:100%;padding:13px">💳 Assinar agora — R$ 300,00/mês</button>
       </div>
     </div>
 
@@ -302,6 +307,7 @@ async function init(){
   document.getElementById('sbNome').textContent=nome;
   document.getElementById('mFavs').textContent=favs.length;
   await carregarMetricas();
+  await checarPlano();
   document.getElementById('loading').style.display='none';
   await buscar();
 }
@@ -339,6 +345,44 @@ async function renderFavs(){
   const lista=results.filter(Boolean);
   if(!lista.length){grid.innerHTML='<div class="empty-state"><div class="emo">⭐</div><p>Atletas não encontrados.</p></div>';return;}
   grid.innerHTML=lista.map(a=>cardHTML(a)).join('');
+}
+
+function showMsg(id,m,t){const e=document.getElementById(id);e.textContent=m;e.className='msg '+t;setTimeout(()=>{e.className='msg'},5000)}
+
+async function checarPlano(){
+  const{data:{session}}=await sb.auth.getSession();
+  const{data}=await sb.from('olheiros').select('plano_ativo').eq('id',session.user.id).single();
+  const el=document.getElementById('statusPlano');
+  const btn=document.getElementById('btnAssinar');
+  if(data?.plano_ativo){
+    el.innerHTML='<div style="background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);border-radius:2px;padding:10px 14px;font-size:12px;color:var(--v)">✓ Plano ativo — você já tem acesso completo ao banco de talentos!</div>';
+    btn.style.display='none';
+  } else {
+    el.innerHTML='<div style="background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.25);border-radius:2px;padding:10px 14px;font-size:12px;color:var(--y)">⚠ Plano inativo — assine para ter acesso completo.</div>';
+    btn.style.display='block';
+  }
+}
+
+async function assinarPlano(){
+  const btn=document.getElementById('btnAssinar');
+  btn.disabled=true;btn.textContent='Gerando pagamento...';
+  try{
+    const{data:{session}}=await sb.auth.getSession();
+    const res=await fetch('/api/criar-pagamento',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({tipo:'olheiro',userId:session.user.id,email:session.user.email})
+    });
+    const data=await res.json();
+    if(data.init_point){
+      window.location.href=data.init_point;
+    } else {
+      showMsg('msgPlano','Erro ao gerar pagamento. Tente novamente.','err');
+    }
+  }catch(e){
+    showMsg('msgPlano','Erro: '+e.message,'err');
+  }
+  btn.disabled=false;btn.textContent='💳 Assinar agora — R$ 300,00/mês';
 }
 
 async function sair(){await sb.auth.signOut();window.location.href='index.html';}
