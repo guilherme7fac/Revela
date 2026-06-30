@@ -90,6 +90,33 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
 .ea-cta{display:inline-flex;align-items:center;gap:6px;background:var(--v);color:var(--p);font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:10px 18px;border-radius:2px;border:none;cursor:pointer;transition:background .2s}
 .ea-cta:hover{background:var(--ve)}
 
+/* ÍNDICE DE VISIBILIDADE */
+.iv-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px}
+.iv-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;color:var(--b)}
+.iv-percent{font-family:'Space Mono',monospace;font-size:13px;color:var(--c)}
+.iv-percent strong{color:var(--v);font-size:15px}
+.iv-headline{font-size:13px;color:var(--c);line-height:1.5;margin-bottom:16px}
+
+.criterios-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.criterio-item{display:flex;align-items:center;gap:10px;font-size:13px;padding:2px 0}
+.criterio-check{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;border:1px solid rgba(255,255,255,.12)}
+.criterio-check.feito{background:rgba(0,230,118,.15);color:var(--v);border-color:rgba(0,230,118,.3)}
+.criterio-check.pendente{background:transparent;color:rgba(255,255,255,.2)}
+.criterio-nome{flex:1;color:var(--c)}
+.criterio-item.feito .criterio-nome{color:var(--b)}
+.criterio-peso{font-family:'Space Mono',monospace;font-size:11px;color:rgba(255,255,255,.25);flex-shrink:0}
+.criterio-item.feito .criterio-peso{color:var(--v)}
+
+.divider-editorial{border:none;border-top:1px dashed rgba(255,255,255,.08);margin:16px 0}
+
+.proximo-passo{background:rgba(255,214,0,.05);border:1px solid rgba(255,214,0,.15);border-radius:4px;padding:14px 16px}
+.proximo-passo.completo{background:rgba(0,230,118,.05);border-color:rgba(0,230,118,.2)}
+.pp-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--y);margin-bottom:6px}
+.proximo-passo.completo .pp-label{color:var(--v)}
+.pp-text{font-size:13px;color:var(--c);line-height:1.6;margin-bottom:10px}
+.pp-cta{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid rgba(255,214,0,.3);color:var(--y);font-weight:500;font-size:12px;letter-spacing:.04em;padding:8px 14px;border-radius:2px;cursor:pointer;transition:background .2s}
+.pp-cta:hover{background:rgba(255,214,0,.1)}
+
 /* SECTION BOX */
 .sbox{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:26px;margin-bottom:18px}
 .sbox-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.5px;color:var(--b);margin-bottom:3px}
@@ -228,7 +255,26 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
         <div class="card"><div class="card-label">Score médio</div><div class="card-value y" id="statScore">—</div><div class="card-desc">avaliação da IA</div><div class="score-trend up" id="scoreTrend" style="display:none">↑ <span id="scoreTrendTxt">+6 pts desde o último vídeo</span></div></div>
       </div>
 
-      <!-- ATIVIDADE RECENTE — Prova de Visibilidade (Etapa 1: dado estático de exemplo, sem lógica ainda) -->
+      <!-- ÍNDICE DE VISIBILIDADE — calculado por calcularIndiceVisibilidade(), renderizado por renderIndiceVisibilidade() -->
+      <div class="activity-feed" id="blocoIndice">
+        <div class="iv-header">
+          <div class="iv-title">Índice de Visibilidade</div>
+          <div class="iv-percent"><strong id="ivPercent">—</strong>%</div>
+        </div>
+        <div class="iv-headline" id="ivHeadline">Carregando seus critérios...</div>
+
+        <div class="criterios-list" id="criteriosList"></div>
+
+        <hr class="divider-editorial">
+
+        <div class="proximo-passo" id="proximoPasso">
+          <div class="pp-label" id="ppLabel">Próximo passo</div>
+          <div class="pp-text" id="ppText">—</div>
+          <button class="pp-cta" id="ppCta" style="display:none"></button>
+        </div>
+      </div>
+
+      <!-- ATIVIDADE RECENTE -->
       <div class="activity-feed">
         <div class="af-header">
           <div class="af-title">Atividade Recente</div>
@@ -244,25 +290,25 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
             <div class="vc-time">2h</div>
           </div>
           <div class="visibility-card">
-            <div class="vc-icon media">🤖</div>
-            <div class="vc-text">
-              <div class="vc-title">Sua análise de IA está pronta</div>
-              <div class="vc-desc">Score geral: 78. Veja o relatório completo em Meus Vídeos.</div>
-            </div>
-            <div class="vc-time">1d</div>
-          </div>
-          <div class="visibility-card">
             <div class="vc-icon baixa">🔍</div>
             <div class="vc-text">
-              <div class="vc-title">Seu perfil apareceu em uma busca</div>
+              <div class="vc-title">Seu perfil apareceu em busca</div>
               <div class="vc-desc">Um olheiro buscou atletas em SP, posição Atacante.</div>
             </div>
             <div class="vc-time">2d</div>
           </div>
           <div class="visibility-card">
+            <div class="vc-icon media">🤖</div>
+            <div class="vc-text">
+              <div class="vc-title">Sua análise ficou pronta</div>
+              <div class="vc-desc">Score geral: 78. Veja o relatório completo em Meus Vídeos.</div>
+            </div>
+            <div class="vc-time">1d</div>
+          </div>
+          <div class="visibility-card">
             <div class="vc-icon alerta">⚠</div>
             <div class="vc-text">
-              <div class="vc-title">Complete seu perfil para aparecer mais</div>
+              <div class="vc-title">Complete seu perfil</div>
               <div class="vc-desc">Atletas com perfil completo aparecem em mais filtros de busca.</div>
             </div>
             <div class="vc-time">—</div>
@@ -405,15 +451,123 @@ function irPara(sec,btn){
 function showMsg(id,m,t){const e=document.getElementById(id);e.textContent=m;e.className='msg '+t;setTimeout(()=>{e.className='msg'},5000)}
 function scCls(s){return s>=75?'sv-a':s>=50?'sv-m':'sv-b'}
 
+// ÍNDICE DE VISIBILIDADE — Prova de Visibilidade (Revela 2.0)
+// Função pura: não faz fetch, só recebe os dados já carregados por carregarPerfil() e carregarVideos()
+function calcularIndiceVisibilidade(atleta, videos){
+  const lista = videos || [];
+  const temVideo = lista.length > 0;
+  const temIA = lista.some(v => v.relatorio?.score_geral != null);
+
+  const criterios = [
+    {
+      chave: 'perfil',
+      nome: 'Perfil básico completo',
+      peso: 20,
+      feito: !!(atleta?.nome && atleta?.cidade && atleta?.estado && atleta?.data_nascimento),
+      acao: 'Complete nome, cidade, estado e data de nascimento.',
+      foco: 'perfil'
+    },
+    {
+      chave: 'posicao',
+      nome: 'Posição preenchida',
+      peso: 10,
+      feito: !!atleta?.posicao,
+      acao: 'Informe sua posição em campo.',
+      foco: 'perfil'
+    },
+    {
+      chave: 'altura',
+      nome: 'Altura preenchida',
+      peso: 15,
+      feito: !!atleta?.altura,
+      acao: 'Adicione sua altura ao perfil.',
+      foco: 'perfil'
+    },
+    {
+      chave: 'video',
+      nome: 'Primeiro vídeo enviado',
+      peso: 30,
+      feito: temVideo,
+      acao: 'Envie seu primeiro vídeo para a IA analisar.',
+      foco: 'videos'
+    },
+    {
+      chave: 'ia',
+      nome: 'IA concluída',
+      peso: 25,
+      feito: temIA,
+      acao: 'Aguarde a IA concluir a análise do seu vídeo.',
+      foco: 'videos'
+    }
+  ];
+
+  const percentual = criterios.reduce((soma, c) => soma + (c.feito ? c.peso : 0), 0);
+
+  // Ajuste 2: próximo passo é sempre o critério pendente de MAIOR peso, não o primeiro da lista
+  const pendentes = criterios.filter(c => !c.feito).sort((a, b) => b.peso - a.peso);
+  const proximoPasso = pendentes[0] || null;
+
+  return { percentual, criterios, proximoPasso };
+}
+
+function renderIndiceVisibilidade(resultado){
+  const { percentual, criterios, proximoPasso } = resultado;
+
+  document.getElementById('ivPercent').textContent = percentual;
+
+  // Ajuste 1: headline nunca soa como veredito de fracasso, mesmo em 0%
+  const headlineEl = document.getElementById('ivHeadline');
+  if(percentual === 100){
+    headlineEl.textContent = 'Seu perfil está com visibilidade máxima na busca dos olheiros.';
+  } else if(percentual === 0){
+    headlineEl.textContent = 'Você está a um passo de aparecer mais para os olheiros.';
+  } else {
+    headlineEl.textContent = 'Veja o que já conta a seu favor e o que falta para subir seu índice.';
+  }
+
+  // Ajuste 3: checklist sempre visível, mesmo em 100%
+  document.getElementById('criteriosList').innerHTML = criterios.map(c => `
+    <div class="criterio-item ${c.feito ? 'feito' : ''}">
+      <div class="criterio-check ${c.feito ? 'feito' : 'pendente'}">${c.feito ? '✓' : ''}</div>
+      <div class="criterio-nome">${c.nome}</div>
+      <div class="criterio-peso">+${c.peso}%</div>
+    </div>
+  `).join('');
+
+  const ppBox = document.getElementById('proximoPasso');
+  const ppLabel = document.getElementById('ppLabel');
+  const ppText = document.getElementById('ppText');
+  const ppCta = document.getElementById('ppCta');
+
+  if(!proximoPasso){
+    ppBox.classList.add('completo');
+    ppLabel.textContent = 'Perfil completo';
+    ppText.textContent = 'Você concluiu todos os critérios. Continue enviando vídeos para manter seu perfil em destaque.';
+    ppCta.style.display = 'none';
+  } else {
+    ppBox.classList.remove('completo');
+    ppLabel.textContent = 'Próximo passo';
+    ppText.textContent = proximoPasso.acao + ` Isso aumenta seu índice em até +${proximoPasso.peso}%.`;
+    ppCta.style.display = 'inline-flex';
+    ppCta.textContent = proximoPasso.foco === 'videos' ? 'Enviar vídeo →' : 'Completar perfil →';
+    ppCta.onclick = () => {
+      const alvo = proximoPasso.foco === 'videos' ? 1 : 0;
+      irPara(proximoPasso.foco === 'videos' ? 'videos' : 'perfil', document.querySelectorAll('.sb-item')[alvo]);
+    };
+  }
+}
+
 async function init(){
   const{data:{session}}=await sb.auth.getSession();
   if(!session){window.location.href='index.html';return;}
   userId=session.user.id;
   const nome=session.user.user_metadata?.nome||session.user.email.split('@')[0];
   document.getElementById('sbNome').textContent=nome;
-  await carregarPerfil();
-  await carregarVideos();
+  const atleta=await carregarPerfil();
+  const videos=await carregarVideos();
   await checarPlano();
+  const indice=calcularIndiceVisibilidade(atleta,videos);
+  renderIndiceVisibilidade(indice);
   document.getElementById('loading').style.display='none';
 }
 
@@ -428,6 +582,7 @@ async function carregarPerfil(){
     document.getElementById('pAltura').value=data.altura||'';
     if(data.nome)document.getElementById('sbNome').textContent=data.nome;
   }
+  return data||null;
 }
 
 async function salvarPerfil(){
@@ -457,7 +612,7 @@ async function carregarVideos(){
     document.getElementById('statScore').textContent=med;
   }
   const lista=document.getElementById('videosList');
-  if(!data||!data.length){lista.innerHTML='<div class="empty">Nenhum vídeo enviado ainda.</div>';return;}
+  if(!data||!data.length){lista.innerHTML='<div class="empty">Nenhum vídeo enviado ainda.</div>';return data||[];}
   lista.innerHTML=data.map(v=>`
     <div class="vitem">
       <div class="vi-hd">
@@ -485,6 +640,7 @@ async function carregarVideos(){
         </div>
       </div>`:''}
     </div>`).join('');
+  return data||[];
 }
 
 async function analisarComIA(url,desc,pos){
