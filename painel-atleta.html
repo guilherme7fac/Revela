@@ -54,6 +54,41 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
 .card-value{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;color:var(--b)}
 .card-value.v{color:var(--v)}.card-value.y{color:var(--y)}
 .card-desc{font-size:11px;color:var(--c);margin-top:4px}
+.score-trend{font-size:11px;margin-top:4px;display:flex;align-items:center;gap:4px}
+.score-trend.up{color:var(--v)}
+.score-trend.flat{color:var(--c)}
+
+/* SIDEBAR BADGE */
+.sb-badge{margin-left:auto;background:var(--v);color:var(--p);font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.02em;padding:2px 6px;border-radius:10px;line-height:1.4}
+
+/* ATIVIDADE RECENTE */
+.activity-feed{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:20px 22px;margin-bottom:18px}
+.af-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.af-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;color:var(--b)}
+.af-updated{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);display:flex;align-items:center;gap:5px}
+.af-updated::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--v);display:inline-block;animation:afpulse 2s ease-in-out infinite}
+@keyframes afpulse{0%,100%{opacity:1}50%{opacity:.3}}
+.af-list{display:flex;flex-direction:column;gap:2px}
+.visibility-card{display:flex;align-items:flex-start;gap:12px;padding:12px 8px;border-radius:4px;transition:background .15s}
+.visibility-card:hover{background:rgba(255,255,255,.025)}
+.visibility-card+.visibility-card{border-top:1px solid rgba(255,255,255,.05)}
+.vc-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.vc-icon.alta{background:rgba(0,230,118,.12);color:var(--v)}
+.vc-icon.media{background:rgba(0,230,118,.08);color:var(--v)}
+.vc-icon.baixa{background:rgba(100,181,246,.1);color:#64B5F6}
+.vc-icon.alerta{background:rgba(255,214,0,.1);color:var(--y)}
+.vc-text{flex:1;min-width:0}
+.vc-title{font-size:13px;font-weight:500;color:var(--b);margin-bottom:2px}
+.vc-desc{font-size:12px;color:var(--c);line-height:1.5}
+.vc-time{font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,.25);flex-shrink:0;padding-top:2px;white-space:nowrap}
+
+/* ESTADO VAZIO */
+.empty-activity{text-align:center;padding:32px 20px}
+.ea-icon{font-size:30px;margin-bottom:12px}
+.ea-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.5px;color:var(--b);margin-bottom:6px}
+.ea-desc{font-size:12px;color:var(--c);line-height:1.6;max-width:340px;margin:0 auto 16px}
+.ea-cta{display:inline-flex;align-items:center;gap:6px;background:var(--v);color:var(--p);font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:10px 18px;border-radius:2px;border:none;cursor:pointer;transition:background .2s}
+.ea-cta:hover{background:var(--ve)}
 
 /* SECTION BOX */
 .sbox{background:var(--p2);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:26px;margin-bottom:18px}
@@ -143,6 +178,7 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
     <button class="sb-item active" onclick="irPara('perfil',this)">
       <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Meu Perfil
+      <span class="sb-badge" id="sbBadge" style="display:none">+3</span>
     </button>
     <button class="sb-item" onclick="irPara('videos',this)">
       <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
@@ -189,8 +225,63 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
       <div class="cards">
         <div class="card"><div class="card-label">Visualizações</div><div class="card-value v" id="statViews">0</div><div class="card-desc">clubes viram seu perfil</div></div>
         <div class="card"><div class="card-label">Vídeos</div><div class="card-value" id="statVids">0</div><div class="card-desc">enviados</div></div>
-        <div class="card"><div class="card-label">Score médio</div><div class="card-value y" id="statScore">—</div><div class="card-desc">avaliação da IA</div></div>
+        <div class="card"><div class="card-label">Score médio</div><div class="card-value y" id="statScore">—</div><div class="card-desc">avaliação da IA</div><div class="score-trend up" id="scoreTrend" style="display:none">↑ <span id="scoreTrendTxt">+6 pts desde o último vídeo</span></div></div>
       </div>
+
+      <!-- ATIVIDADE RECENTE — Prova de Visibilidade (Etapa 1: dado estático de exemplo, sem lógica ainda) -->
+      <div class="activity-feed">
+        <div class="af-header">
+          <div class="af-title">Atividade Recente</div>
+          <div class="af-updated">Atualizado agora</div>
+        </div>
+        <div class="af-list">
+          <div class="visibility-card">
+            <div class="vc-icon alta">👁</div>
+            <div class="vc-text">
+              <div class="vc-title">Um olheiro viu seu perfil</div>
+              <div class="vc-desc">Alguém da rede de scouts acessou seus dados em São Paulo, SP.</div>
+            </div>
+            <div class="vc-time">2h</div>
+          </div>
+          <div class="visibility-card">
+            <div class="vc-icon media">🤖</div>
+            <div class="vc-text">
+              <div class="vc-title">Sua análise de IA está pronta</div>
+              <div class="vc-desc">Score geral: 78. Veja o relatório completo em Meus Vídeos.</div>
+            </div>
+            <div class="vc-time">1d</div>
+          </div>
+          <div class="visibility-card">
+            <div class="vc-icon baixa">🔍</div>
+            <div class="vc-text">
+              <div class="vc-title">Seu perfil apareceu em uma busca</div>
+              <div class="vc-desc">Um olheiro buscou atletas em SP, posição Atacante.</div>
+            </div>
+            <div class="vc-time">2d</div>
+          </div>
+          <div class="visibility-card">
+            <div class="vc-icon alerta">⚠</div>
+            <div class="vc-text">
+              <div class="vc-title">Complete seu perfil para aparecer mais</div>
+              <div class="vc-desc">Atletas com perfil completo aparecem em mais filtros de busca.</div>
+            </div>
+            <div class="vc-time">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESTADO VAZIO — versão alternativa para comparação visual (Etapa 1). Deixar comentado por padrão. -->
+      <!--
+      <div class="activity-feed">
+        <div class="empty-activity">
+          <div class="ea-icon">🎯</div>
+          <div class="ea-title">Sua jornada começa agora</div>
+          <div class="ea-desc">Quando um olheiro visualizar seu perfil ou sua IA terminar uma análise, você verá aqui. Envie seu primeiro vídeo para começar a aparecer nas buscas.</div>
+          <button class="ea-cta" onclick="irPara('videos', document.querySelectorAll('.sb-item')[1])">Enviar meu primeiro vídeo →</button>
+        </div>
+      </div>
+      -->
+
       <div class="sbox">
         <div class="sbox-title">Dados pessoais</div>
         <p class="sbox-sub">Essas informações aparecem para os olheiros ao visualizar seu perfil.</p>
