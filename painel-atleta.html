@@ -91,11 +91,20 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
 .ea-cta:hover{background:var(--ve)}
 
 /* ÍNDICE DE VISIBILIDADE */
-.iv-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px}
-.iv-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;color:var(--b)}
-.iv-percent{font-family:'Space Mono',monospace;font-size:13px;color:var(--c)}
-.iv-percent strong{color:var(--v);font-size:15px}
-.iv-headline{font-size:13px;color:var(--c);line-height:1.5;margin-bottom:16px}
+.iv-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:16px}
+.iv-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;color:var(--b);line-height:1}
+
+/* Percentual em destaque — protagonista visual do componente */
+.iv-percent-wrap{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0}
+.iv-percent-num{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:.9;letter-spacing:-1px;color:var(--v)}
+.iv-percent-sym{font-family:'Space Mono',monospace;font-size:14px;color:rgba(0,230,118,.5);line-height:1;margin-top:4px;text-align:right}
+
+.iv-headline{font-size:13px;color:var(--c);line-height:1.5;margin-bottom:14px}
+
+/* Barra de progresso moderna */
+.iv-progress-track{height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin-bottom:18px;position:relative}
+.iv-progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--ve) 0%,var(--v) 100%);width:0%;transition:width .8s cubic-bezier(.22,.61,.36,1);position:relative}
+.iv-progress-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:8px;background:white;border-radius:50%;opacity:.35;filter:blur(2px)}
 
 .criterios-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
 .criterio-item{display:flex;align-items:center;gap:10px;font-size:13px;padding:2px 0}
@@ -258,10 +267,17 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
       <!-- ÍNDICE DE VISIBILIDADE — calculado por calcularIndiceVisibilidade(), renderizado por renderIndiceVisibilidade() -->
       <div class="activity-feed" id="blocoIndice">
         <div class="iv-header">
-          <div class="iv-title">Índice de Visibilidade</div>
-          <div class="iv-percent"><strong id="ivPercent">—</strong>%</div>
+          <div class="iv-title">Índice de<br>Visibilidade</div>
+          <div class="iv-percent-wrap">
+            <div class="iv-percent-num" id="ivPercent">—</div>
+            <div class="iv-percent-sym">%</div>
+          </div>
         </div>
         <div class="iv-headline" id="ivHeadline">Carregando seus critérios...</div>
+
+        <div class="iv-progress-track">
+          <div class="iv-progress-fill" id="ivProgressBar"></div>
+        </div>
 
         <div class="criterios-list" id="criteriosList"></div>
 
@@ -514,6 +530,11 @@ function renderIndiceVisibilidade(resultado){
   const { percentual, criterios, proximoPasso } = resultado;
 
   document.getElementById('ivPercent').textContent = percentual;
+  // Anima a barra — setTimeout garante que o transition CSS dispara após o repaint inicial
+  setTimeout(() => {
+    const bar = document.getElementById('ivProgressBar');
+    if(bar) bar.style.width = percentual + '%';
+  }, 60);
 
   // Ajuste 1: headline nunca soa como veredito de fracasso, mesmo em 0%
   const headlineEl = document.getElementById('ivHeadline');
