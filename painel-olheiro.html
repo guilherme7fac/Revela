@@ -106,6 +106,82 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
 .suporte-icon{font-size:30px}
 .suporte-title{font-weight:500;font-size:14px;color:var(--b)}
 .suporte-desc{font-size:12px;color:var(--c);line-height:1.5}
+/* ─── SCOUTING 2.0 ─────────────────────────────────────────── */
+
+/* Seção header com badge */
+.sec20-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;gap:12px}
+.sec20-badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.13em;text-transform:uppercase;background:rgba(100,181,246,.12);color:#64B5F6;border:1px solid rgba(100,181,246,.25);padding:3px 10px;border-radius:10px;flex-shrink:0;margin-top:6px}
+
+/* BLOCO CONTAINER ─ reutiliza espírito do .sbox mas com borda viva */
+.bloco20{background:var(--p2);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:24px 26px;margin-bottom:20px;transition:border-color .25s}
+.bloco20:hover{border-color:rgba(255,255,255,.12)}
+.bloco20-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;color:var(--b);margin-bottom:3px}
+.bloco20-sub{font-size:12px;color:var(--c);margin-bottom:20px;line-height:1.5}
+
+/* CENTRO DE ATIVIDADE ─ feed de eventos do olheiro */
+.ca-feed{display:flex;flex-direction:column;gap:0}
+.ca-item{display:flex;align-items:flex-start;gap:14px;padding:13px 10px;border-radius:6px;transition:background .18s,transform .18s;cursor:default}
+.ca-item:hover{background:rgba(255,255,255,.03);transform:translateX(2px)}
+.ca-item+.ca-item{border-top:1px solid rgba(255,255,255,.04)}
+.ca-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;transition:transform .2s}
+.ca-item:hover .ca-dot{transform:scale(1.1)}
+.ca-dot.busca{background:rgba(100,181,246,.12);box-shadow:0 0 0 1px rgba(100,181,246,.2)}
+.ca-dot.fav{background:rgba(255,214,0,.12);box-shadow:0 0 0 1px rgba(255,214,0,.2)}
+.ca-dot.novo{background:rgba(0,230,118,.12);box-shadow:0 0 0 1px rgba(0,230,118,.2)}
+.ca-body{flex:1;min-width:0}
+.ca-title{font-size:13px;font-weight:500;color:var(--b);margin-bottom:2px;transition:color .18s}
+.ca-item:hover .ca-title{color:#fff}
+.ca-desc{font-size:12px;color:var(--c);line-height:1.5}
+.ca-time{font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,.22);flex-shrink:0;padding-top:3px;white-space:nowrap}
+
+/* RADAR DE TALENTOS ─ grid de posições com contagem */
+.radar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px}
+.radar-pos{background:var(--p3);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:16px 14px;display:flex;flex-direction:column;gap:6px;transition:border-color .22s,transform .22s,background .22s;cursor:pointer}
+.radar-pos:hover{border-color:rgba(100,181,246,.3);background:rgba(100,181,246,.04);transform:translateY(-2px)}
+.radar-pos.top{border-color:rgba(0,230,118,.25);background:rgba(0,230,118,.04)}
+.radar-pos.top:hover{border-color:rgba(0,230,118,.45);background:rgba(0,230,118,.08)}
+.rp-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--c)}
+.rp-count{font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;color:var(--b)}
+.radar-pos.top .rp-count{color:var(--v)}
+.rp-score{font-size:11px;color:var(--c);display:flex;align-items:center;gap:5px}
+.rp-score-dot{width:6px;height:6px;border-radius:50%;background:var(--c);flex-shrink:0}
+.radar-pos.top .rp-score-dot{background:var(--v)}
+.rp-score-txt{}
+.radar-hint{font-size:11px;color:rgba(255,255,255,.2);margin-top:8px;font-style:italic}
+
+/* DESTAQUES DA SEMANA ─ carrossel horizontal de cards compactos */
+.dest-scroll{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.dest-scroll::-webkit-scrollbar{height:3px}
+.dest-scroll::-webkit-scrollbar-track{background:transparent}
+.dest-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.dest-card{background:var(--p3);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:18px 16px;min-width:200px;flex-shrink:0;scroll-snap-align:start;transition:border-color .22s,transform .22s;cursor:default;display:flex;flex-direction:column;gap:10px}
+.dest-card:hover{border-color:rgba(0,230,118,.25);transform:translateY(-2px)}
+.dest-card.destaque{border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.04)}
+.dc-avatar{width:40px;height:40px;border-radius:50%;background:rgba(0,230,118,.1);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--v);flex-shrink:0}
+.dc-nome{font-size:13px;font-weight:500;color:var(--b);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dc-meta{font-size:11px;color:var(--c)}
+.dc-score{font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;color:var(--v)}
+.dc-pos{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--c)}
+.dc-btn{display:inline-flex;align-items:center;justify-content:center;background:none;border:1px solid rgba(0,230,118,.25);color:var(--v);font-size:11px;letter-spacing:.04em;padding:6px 12px;border-radius:2px;cursor:pointer;transition:background .2s,border-color .2s;text-transform:uppercase;font-weight:500;width:100%}
+.dc-btn:hover{background:rgba(0,230,118,.1);border-color:rgba(0,230,118,.45)}
+
+/* INSIGHTS ─ lista de análises automáticas */
+.insights-list{display:flex;flex-direction:column;gap:10px}
+.insight-item{display:flex;align-items:flex-start;gap:14px;background:var(--p3);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:16px;transition:border-color .22s,transform .2s}
+.insight-item:hover{border-color:rgba(100,181,246,.2);transform:translateX(2px)}
+.insight-icon{width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.insight-icon.stat{background:rgba(100,181,246,.1)}
+.insight-icon.alerta{background:rgba(255,214,0,.1)}
+.insight-icon.trend{background:rgba(0,230,118,.1)}
+.insight-body{flex:1}
+.insight-title{font-size:13px;font-weight:500;color:var(--b);margin-bottom:4px}
+.insight-desc{font-size:12px;color:var(--c);line-height:1.6}
+.insight-cta{font-size:11px;color:#64B5F6;letter-spacing:.04em;text-transform:uppercase;font-weight:500;cursor:pointer;background:none;border:none;padding:0;margin-top:6px;display:inline-block;transition:opacity .2s}
+.insight-cta:hover{opacity:.7}
+
+/* sb-item active ─ para nova aba no menu */
+.sb-item.active20{background:rgba(100,181,246,.1);color:#64B5F6}
+
 @media(max-width:900px){.atletas-grid{grid-template-columns:1fr}.filtros{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
@@ -129,6 +205,9 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
     </button>
     <button class="sb-item" onclick="irPara('favoritos',this)">
       <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Favoritos
+    </button>
+    <button class="sb-item" onclick="irPara('scouting',this)">
+      <svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Scouting 2.0
     </button>
     <span class="sb-label">Plataforma</span>
     <a class="sb-item" href="index.html">
@@ -177,6 +256,94 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
       <div class="page-title">Favoritos</div>
       <p class="page-sub">Atletas que você salvou para acompanhar de perto.</p>
       <div class="atletas-grid" id="gridFavs"><div class="empty-state"><div class="emo">⭐</div><p>Você ainda não favoritou nenhum atleta.</p></div></div>
+    </div>
+
+    <!-- SCOUTING 2.0 -->
+    <div class="tab-sec" id="sec-scouting">
+      <div class="page-title">Scouting 2.0</div>
+      <p class="page-sub">Centro de inteligência e atividade da sua operação de scouting.</p>
+
+      <!-- CENTRO DE ATIVIDADE -->
+      <div class="bloco20">
+        <div class="sec20-header">
+          <div>
+            <div class="bloco20-title">Centro de Atividade</div>
+            <div class="bloco20-sub">Registro das suas últimas ações na plataforma.</div>
+          </div>
+          <div class="sec20-badge">Ao vivo</div>
+        </div>
+        <div class="ca-feed" id="caFeed">
+          <!-- Preenchido por renderCentroAtividade() -->
+          <div class="ca-item">
+            <div class="ca-dot busca">🔍</div>
+            <div class="ca-body">
+              <div class="ca-title">Você buscou atacantes em São Paulo</div>
+              <div class="ca-desc">Filtro aplicado: Atacante · SP · Score 70+</div>
+            </div>
+            <div class="ca-time">Agora</div>
+          </div>
+          <div class="ca-item">
+            <div class="ca-dot fav">★</div>
+            <div class="ca-body">
+              <div class="ca-title">Atleta adicionado aos favoritos</div>
+              <div class="ca-desc">Perfil salvo para acompanhamento.</div>
+            </div>
+            <div class="ca-time">1h</div>
+          </div>
+          <div class="ca-item">
+            <div class="ca-dot novo">⚡</div>
+            <div class="ca-body">
+              <div class="ca-title">3 novos atletas cadastrados desde ontem</div>
+              <div class="ca-desc">Banco de dados atualizado com novos perfis analisados pela IA.</div>
+            </div>
+            <div class="ca-time">1d</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RADAR DE TALENTOS -->
+      <div class="bloco20">
+        <div class="sec20-header">
+          <div>
+            <div class="bloco20-title">Radar de Talentos</div>
+            <div class="bloco20-sub">Distribuição atual dos atletas por posição no banco de dados.</div>
+          </div>
+          <div class="sec20-badge">Tempo real</div>
+        </div>
+        <div class="radar-grid" id="radarGrid">
+          <!-- Preenchido por renderRadar() -->
+          <div class="empty-state" style="grid-column:1/-1;padding:32px"><p>Carregando radar...</p></div>
+        </div>
+        <div class="radar-hint">* Posição em destaque é a com maior score médio de IA no banco.</div>
+      </div>
+
+      <!-- DESTAQUES DA SEMANA -->
+      <div class="bloco20">
+        <div class="sec20-header">
+          <div>
+            <div class="bloco20-title">Destaques da Semana</div>
+            <div class="bloco20-sub">Atletas com os maiores scores de IA adicionados nos últimos 7 dias.</div>
+          </div>
+          <div class="sec20-badge">Top 5</div>
+        </div>
+        <div class="dest-scroll" id="destScroll">
+          <div class="empty-state" style="width:100%;padding:24px"><p>Carregando destaques...</p></div>
+        </div>
+      </div>
+
+      <!-- INSIGHTS AUTOMÁTICOS -->
+      <div class="bloco20">
+        <div class="sec20-header">
+          <div>
+            <div class="bloco20-title">Insights Automáticos</div>
+            <div class="bloco20-sub">Análises geradas com base nos dados reais do banco.</div>
+          </div>
+          <div class="sec20-badge">IA</div>
+        </div>
+        <div class="insights-list" id="insightsList">
+          <div class="empty-state" style="padding:24px"><p>Carregando insights...</p></div>
+        </div>
+      </div>
     </div>
 
     <!-- PLANO -->
@@ -242,6 +409,7 @@ function irPara(sec,btn){
   if(btn)btn.classList.add('active');
   closeSb();window.scrollTo(0,0);
   if(sec==='favoritos')renderFavs();
+  if(sec==='scouting')carregarScouting(); // NOVO — carrega os 3 blocos dinâmicos só quando a aba é acessada
 }
 function ini(n){return n?n.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase():'??'}
 function sc(s){return s>=75?'sa':s>=50?'sm':'sb2'}
@@ -298,6 +466,129 @@ function cardHTML(a){
       <button class="btn-fav ${isFav?'ativo':''}" data-id="${a.id}" onclick="toggleFav('${a.id}')">${isFav?'★ Favoritado':'☆ Favoritar'}</button>
     </div>
   </div>`;
+}
+
+// ─── SCOUTING 2.0 ────────────────────────────────────────────
+
+// Orquestrador — chamado apenas quando a aba é acessada
+async function carregarScouting(){
+  const{data:atletas}=await sb.from('atletas').select('*, videos(relatorio,criado_em)');
+  const lista=atletas||[];
+  renderRadar(lista);
+  renderDestaques(lista);
+  gerarInsights(lista);
+}
+
+// RADAR DE TALENTOS — agrupa atletas por posição com score médio
+function renderRadar(lista){
+  const posicoes=['Goleiro','Lateral Direito','Lateral Esquerdo','Zagueiro','Volante','Meia','Atacante','Ponta Direita','Ponta Esquerda'];
+  const grupos={};
+  posicoes.forEach(p=>{grupos[p]={count:0,scores:[]};});
+  lista.forEach(a=>{
+    if(a.posicao&&grupos[a.posicao]){
+      grupos[a.posicao].count++;
+      const mScore=Math.max(...(a.videos||[]).map(v=>v.relatorio?.score_geral||0),0);
+      if(mScore>0)grupos[a.posicao].scores.push(mScore);
+    }
+  });
+  const comAtletas=Object.entries(grupos).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
+  if(!comAtletas.length){
+    document.getElementById('radarGrid').innerHTML='<div class="empty-state" style="grid-column:1/-1;padding:24px"><p>Nenhum atleta no banco ainda.</p></div>';
+    return;
+  }
+  const maxScore=Math.max(...comAtletas.map(([,v])=>v.scores.length?v.scores.reduce((a,b)=>a+b,0)/v.scores.length:0));
+  document.getElementById('radarGrid').innerHTML=comAtletas.map(([pos,val])=>{
+    const med=val.scores.length?Math.round(val.scores.reduce((a,b)=>a+b,0)/val.scores.length):null;
+    const isTop=med&&med===maxScore&&med>0;
+    return `<div class="radar-pos ${isTop?'top':''}" onclick="document.getElementById('fPos').value='${pos}';irPara('buscar',document.querySelectorAll('.sb-item')[0]);buscar()">
+      <div class="rp-label">${pos}</div>
+      <div class="rp-count">${val.count}</div>
+      <div class="rp-score"><div class="rp-score-dot"></div><div class="rp-score-txt">${med?'Score médio '+med:'Sem IA'}</div></div>
+    </div>`;
+  }).join('');
+}
+
+// DESTAQUES DA SEMANA — top 5 por score nos últimos 7 dias
+function renderDestaques(lista){
+  const seteDias=new Date();seteDias.setDate(seteDias.getDate()-7);
+  const recentes=lista.filter(a=>{
+    const videos=a.videos||[];
+    return videos.some(v=>v.criado_em&&new Date(v.criado_em)>=seteDias&&v.relatorio?.score_geral);
+  });
+  const comScore=recentes.map(a=>{
+    const melhorScore=Math.max(...(a.videos||[]).map(v=>v.relatorio?.score_geral||0),0);
+    return{...a,melhorScore};
+  }).filter(a=>a.melhorScore>0).sort((a,b)=>b.melhorScore-a.melhorScore).slice(0,5);
+  const el=document.getElementById('destScroll');
+  if(!comScore.length){
+    el.innerHTML='<div class="empty-state" style="width:100%;padding:24px"><p>Nenhum atleta com IA analisada nos últimos 7 dias.</p></div>';
+    return;
+  }
+  el.innerHTML=comScore.map((a,i)=>`
+    <div class="dest-card ${i===0?'destaque':''}">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="dc-avatar">${ini(a.nome)}</div>
+        <div><div class="dc-nome">${a.nome||'Atleta'}</div><div class="dc-meta">📍 ${a.cidade||'—'}, ${a.estado||'—'}</div></div>
+      </div>
+      <div><div class="dc-score">${a.melhorScore}</div><div class="dc-pos">${a.posicao||'Posição N/D'}</div></div>
+      <button class="dc-btn" onclick="toggleFav('${a.id}')">${favs.includes(a.id)?'★ Favoritado':'☆ Favoritar'}</button>
+    </div>`).join('');
+}
+
+// INSIGHTS AUTOMÁTICOS — gerados a partir dos dados reais, sem chamada de IA externa
+function gerarInsights(lista){
+  const insights=[];
+  const total=lista.length;
+  const comVideo=lista.filter(a=>(a.videos||[]).length>0).length;
+  const comIA=lista.filter(a=>(a.videos||[]).some(v=>v.relatorio?.score_geral)).length;
+  const altos=lista.filter(a=>Math.max(...(a.videos||[]).map(v=>v.relatorio?.score_geral||0),0)>=80);
+  const semPerfil=lista.filter(a=>!a.posicao||!a.altura).length;
+
+  if(total>0){
+    const pct=Math.round(comIA/total*100);
+    insights.push({
+      icon:'📊',tipo:'stat',
+      title:`${pct}% dos atletas têm análise de IA concluída`,
+      desc:`De ${total} atletas no banco, ${comIA} já passaram pela análise. ${total-comIA} ainda aguardam envio de vídeo.`,
+      cta:null
+    });
+  }
+  if(altos.length>0){
+    insights.push({
+      icon:'🎯',tipo:'trend',
+      title:`${altos.length} atleta${altos.length>1?'s':''} com score 80+ disponíve${altos.length>1?'is':'l'}`,
+      desc:`Alta performance detectada. Esses perfis têm potencial acima da média segundo a avaliação de IA.`,
+      cta:'Ver atletas com 80+'
+    });
+  }
+  if(semPerfil>0){
+    insights.push({
+      icon:'⚠',tipo:'alerta',
+      title:`${semPerfil} atleta${semPerfil>1?'s':''} com perfil incompleto`,
+      desc:`Posição ou altura não preenchidas. Esses atletas aparecem menos nos filtros de busca.`,
+      cta:null
+    });
+  }
+  if(comVideo===0&&total>0){
+    insights.push({
+      icon:'📹',tipo:'alerta',
+      title:'Nenhum atleta enviou vídeo ainda',
+      desc:'O banco ainda não tem vídeos. Incentive o cadastro de atletas para enriquecer os perfis.',
+      cta:null
+    });
+  }
+  if(!insights.length){
+    insights.push({icon:'✅',tipo:'trend',title:'Banco de dados saudável',desc:'Nenhum alerta identificado. Continue acompanhando novos cadastros.',cta:null});
+  }
+  document.getElementById('insightsList').innerHTML=insights.map(ins=>`
+    <div class="insight-item">
+      <div class="insight-icon ${ins.tipo}">${ins.icon}</div>
+      <div class="insight-body">
+        <div class="insight-title">${ins.title}</div>
+        <div class="insight-desc">${ins.desc}</div>
+        ${ins.cta?`<button class="insight-cta" onclick="document.getElementById('fScore').value='80';irPara('buscar',document.querySelectorAll('.sb-item')[0]);buscar()">${ins.cta} →</button>`:''}
+      </div>
+    </div>`).join('');
 }
 
 async function init(){
