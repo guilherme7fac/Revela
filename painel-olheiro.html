@@ -442,31 +442,7 @@ body{background:var(--p);color:var(--b);font-family:'DM Sans',sans-serif;min-hei
           <div class="sec20-badge">Ao vivo</div>
         </div>
         <div class="ca-feed" id="caFeed">
-          <!-- Preenchido por renderCentroAtividade() -->
-          <div class="ca-item">
-            <div class="ca-dot busca">🔍</div>
-            <div class="ca-body">
-              <div class="ca-title">Você buscou atacantes em São Paulo</div>
-              <div class="ca-desc">Filtro aplicado: Atacante · SP · Score 70+</div>
-            </div>
-            <div class="ca-time">Agora</div>
-          </div>
-          <div class="ca-item">
-            <div class="ca-dot fav">★</div>
-            <div class="ca-body">
-              <div class="ca-title">Atleta adicionado aos favoritos</div>
-              <div class="ca-desc">Perfil salvo para acompanhamento.</div>
-            </div>
-            <div class="ca-time">1h</div>
-          </div>
-          <div class="ca-item">
-            <div class="ca-dot novo">⚡</div>
-            <div class="ca-body">
-              <div class="ca-title">3 novos atletas cadastrados desde ontem</div>
-              <div class="ca-desc">Banco de dados atualizado com novos perfis analisados pela IA.</div>
-            </div>
-            <div class="ca-time">1d</div>
-          </div>
+          <!-- Preenchido dinamicamente por renderCentroAtividade() com dados reais -->
         </div>
       </div>
 
@@ -569,6 +545,13 @@ const {createClient}=supabase;
 const sb=createClient(SURL,SKEY);
 let favs=JSON.parse(localStorage.getItem('revela_favs')||'[]');
 
+// ─── ESTADO DE SESSÃO — Centro de Atividade ──────────────────
+// Esses dados vivem apenas nesta sessão (não persistem entre recargas).
+// São registros honestos do que o olheiro fez desde que abriu o painel.
+let ultimaBusca = null;        // {pos, est, cid, scoreMin, total} — registrado em buscar()
+let perfisFechados = [];       // [{id, nome, pos} ...] — registrado em abrirPerfil()
+let eventosAtividade = [];     // [{tipo, ...} ...] — fav, obs — registrados nas ações
+
 function toggleSb(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sbOverlay').classList.toggle('show')}
 function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('show')}
 function irPara(sec,btn){
@@ -585,7 +568,8 @@ function sc(s){return s>=75?'sa':s>=50?'sm':'sb2'}
 function idade(d){if(!d)return null;return new Date().getFullYear()-new Date(d).getFullYear();}
 
 function toggleFav(id){
-  if(favs.includes(id))favs=favs.filter(f=>f!==id);
+  const eraFav=favs.includes(id);
+  if(eraFav)favs=favs.filter(f=>f!==id);
   else favs.push(id);
   localStorage.setItem('revela_favs',JSON.stringify(favs));
   document.getElementById('mFavs').textContent=favs.length;
@@ -593,6 +577,20 @@ function toggleFav(id){
     btn.classList.toggle('ativo',favs.includes(id));
     btn.textContent=favs.includes(id)?'★ Favoritado':'☆ Favoritar';
   });
+  // Registra evento real de favorito para o Centro de Atividade
+  // Só registra quando ADICIONA (não quando remove)
+  if(!eraFav){
+    // Tenta obter o nome real: primeiro do perfil aberto, depois do card via data-nome
+    let nomeAtleta = null;
+    if(perfilAtletaAtual?.id===id){
+      nomeAtleta = perfilAtletaAtual.nome||null;
+    } else {
+      const card = document.querySelector(`.atleta-card[data-id="${id}"]`);
+      nomeAtleta = card ? (card.dataset.nome||null) : null;
+    }
+    eventosAtividade.unshift({tipo:'fav',id,nome:nomeAtleta,ts:Date.now()});
+    if(eventosAtividade.length>10)eventosAtividade.pop();
+  }
 }
 
 function cardHTML(a){
@@ -601,7 +599,7 @@ function cardHTML(a){
   const rel=melhor?.relatorio;
   const id=idade(a.data_nascimento);
   const isFav=favs.includes(a.id);
-  return `<div class="atleta-card">
+  return `<div class="atleta-card" data-id="${a.id}" data-nome="${(a.nome||'').replace(/"/g,'&quot;')}">
     <div class="ac-top">
       <div class="ac-header">
         <div class="ac-avatar">${ini(a.nome)}</div>
@@ -680,6 +678,13 @@ async function abrirPerfil(atletaId){
     return;
   }
   perfilAtletaAtual=atleta;
+
+  // Registra visualização de perfil para o Centro de Atividade (sessão atual)
+  // Evita duplicatas: só adiciona se esse atleta não foi visto ainda nesta sessão
+  if(!perfisFechados.some(p=>p.id===atleta.id)){
+    perfisFechados.unshift({id:atleta.id,nome:atleta.nome||'Atleta',pos:atleta.posicao||null});
+    if(perfisFechados.length>5)perfisFechados.pop(); // mantém os 5 mais recentes
+  }
 
   // Header
   document.getElementById('psAvatar').textContent=ini(atleta.nome);
@@ -820,10 +825,111 @@ function voltarBusca(){
 
 // ─── SCOUTING 2.0 ────────────────────────────────────────────
 
+// CENTRO DE ATIVIDADE — eventos reais desta sessão + novos atletas do Supabase
+async function renderCentroAtividade(){
+  const eventos=[];
+
+  // EVENTO 1: última busca com filtros ativos (sessão atual)
+  if(ultimaBusca){
+    const partes=[];
+    if(ultimaBusca.pos) partes.push(ultimaBusca.pos);
+    if(ultimaBusca.est) partes.push(ultimaBusca.est);
+    if(ultimaBusca.scoreMin>0) partes.push('Score '+ultimaBusca.scoreMin+'+');
+    if(ultimaBusca.cid) partes.push(ultimaBusca.cid);
+    const descFiltros=partes.length>0?'Filtros: '+partes.join(' · '):'Busca sem filtros específicos.';
+    const descResultado=`${ultimaBusca.total} atleta${ultimaBusca.total!==1?'s':''} encontrado${ultimaBusca.total!==1?'s':''}.`;
+    eventos.push({
+      tipo:'busca',
+      icon:'🔍',
+      dotClass:'busca',
+      titulo:'Você realizou uma busca',
+      desc:`${descFiltros} ${descResultado}`
+    });
+  }
+
+  // EVENTO 2: favoritos adicionados nesta sessão (via eventosAtividade)
+  const favSession=eventosAtividade.filter(e=>e.tipo==='fav');
+  if(favSession.length>0){
+    const ultimo=favSession[0];
+    const nomeExibido=ultimo.nome?`${ultimo.nome} foi adicionado`:'Um atleta foi adicionado';
+    eventos.push({
+      tipo:'fav',
+      icon:'★',
+      dotClass:'fav',
+      titulo:'Atleta favoritado',
+      desc:`${nomeExibido} à sua lista de favoritos nesta sessão.`
+    });
+  }
+
+  // EVENTO 3: perfis abertos nesta sessão
+  if(perfisFechados.length>0){
+    const nomes=perfisFechados.slice(0,3).map(p=>p.nome).join(', ');
+    const sufixo=perfisFechados.length>3?` e mais ${perfisFechados.length-3}`:'';
+    eventos.push({
+      tipo:'perfil',
+      icon:'👁',
+      dotClass:'busca',
+      titulo:`${perfisFechados.length} perfil${perfisFechados.length!==1?'s':''} visualizado${perfisFechados.length!==1?'s':''}`,
+      desc:`${nomes}${sufixo}.`
+    });
+  }
+
+  // EVENTO 4: lista de observação (localStorage — persiste entre sessões)
+  if(obs.length>0){
+    eventos.push({
+      tipo:'obs',
+      icon:'👁‍🗨',
+      dotClass:'novo',
+      titulo:`${obs.length} atleta${obs.length!==1?'s':''} na lista de observação`,
+      desc:'Você está acompanhando esses atletas ao longo do tempo.'
+    });
+  }
+
+  // EVENTO 5: novos atletas no banco desde ontem (dado real do Supabase)
+  try{
+    const ontem=new Date();
+    ontem.setDate(ontem.getDate()-1);
+    const{count}=await sb.from('atletas')
+      .select('*',{count:'exact',head:true})
+      .gte('criado_em',ontem.toISOString());
+    if(count&&count>0){
+      eventos.push({
+        tipo:'novo',
+        icon:'⚡',
+        dotClass:'novo',
+        titulo:`${count} novo${count!==1?'s':''} atleta${count!==1?'s':''} nas últimas 24h`,
+        desc:'O banco de dados foi atualizado com novos cadastros.'
+      });
+    }
+  }catch(e){/* falha silenciosa — não bloqueia o feed */}
+
+  // Renderiza ou mostra estado vazio
+  const el=document.getElementById('caFeed');
+  if(!eventos.length){
+    el.innerHTML=`
+      <div style="text-align:center;padding:32px 20px">
+        <div style="font-size:28px;margin-bottom:12px">📋</div>
+        <div style="font-size:13px;font-weight:500;color:var(--b);margin-bottom:6px">Sem atividade recente</div>
+        <div style="font-size:12px;color:var(--c);line-height:1.6">Suas ações de scouting aparecerão aqui.<br>Busque atletas, abra perfis ou favorize para começar.</div>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML=eventos.map(ev=>`
+    <div class="ca-item">
+      <div class="ca-dot ${ev.dotClass}">${ev.icon}</div>
+      <div class="ca-body">
+        <div class="ca-title">${ev.titulo}</div>
+        <div class="ca-desc">${ev.desc}</div>
+      </div>
+    </div>`).join('');
+}
+
 // Orquestrador — chamado apenas quando a aba é acessada
 async function carregarScouting(){
   const{data:atletas}=await sb.from('atletas').select('*, videos(relatorio,criado_em)');
   const lista=atletas||[];
+  await renderCentroAtividade(); // REAL — eventos da sessão + Supabase
   renderRadar(lista);
   renderDestaques(lista);
   gerarInsights(lista);
@@ -976,6 +1082,11 @@ async function buscar(){
   const grid=document.getElementById('grid');
   if(!lista.length){grid.innerHTML='<div class="empty-state"><div class="emo">🏟️</div><p>Nenhum atleta encontrado.</p></div>';return;}
   grid.innerHTML=lista.map(a=>cardHTML(a)).join('');
+  // Registra a busca real para o Centro de Atividade
+  // Só registra se houve pelo menos um filtro ativo — busca totalmente vazia não é informativa
+  if(est||pos||cid||scoreMin>0){
+    ultimaBusca={est,pos,cid,scoreMin,total:lista.length};
+  }
 }
 
 async function renderFavs(){
